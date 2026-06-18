@@ -12,7 +12,7 @@ export interface OverlayHandlers {
 
 export function createConfigPanel(config: Config, handlers: OverlayHandlers): HTMLElement {
   const panel = document.createElement("div");
-  panel.className = "overlay";
+  panel.className = "overlay card";
 
   const startBtn = document.createElement("button");
   startBtn.type = "button";

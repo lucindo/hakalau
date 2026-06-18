@@ -1,9 +1,26 @@
+:root {
+  --brand: #5fb3b3;
+  --brand-hover: #6fc3c3;
+  --hairline: 1px solid rgba(255, 255, 255, 0.08);
+  --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
 html,
 body {
   margin: 0;
   height: 100%;
   background: #000;
   overflow: hidden;
+}
+
+/* Frosted panel treatment shared by the config and pause cards. */
+.card {
+  border-radius: 14px;
+  background: rgba(18, 18, 20, 0.7);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: var(--hairline);
+  box-shadow: var(--card-shadow);
 }
 
 canvas {
@@ -50,22 +67,16 @@ canvas {
   width: min(300px, 70vw);
   aspect-ratio: 1;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  border: var(--hairline);
+  box-shadow: var(--card-shadow);
 }
 
 .overlay {
   width: min(320px, 100%);
   padding: 22px;
-  border-radius: 14px;
-  background: rgba(18, 18, 20, 0.7);
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
   color: #e8e8e8;
   font: 14px/1.4 system-ui, sans-serif;
-  accent-color: #5fb3b3;
+  accent-color: var(--brand);
 }
 
 .overlay__start {
@@ -75,7 +86,7 @@ canvas {
   padding: 9px;
   border: 0;
   border-radius: 8px;
-  background: #5fb3b3;
+  background: var(--brand);
   color: #0a0a0a;
   font: 600 14px/1 system-ui, sans-serif;
   cursor: pointer;
@@ -83,7 +94,7 @@ canvas {
 }
 
 .overlay__start:hover {
-  background: #6fc3c3;
+  background: var(--brand-hover);
 }
 
 .overlay__row {
@@ -144,12 +155,6 @@ canvas {
   flex-direction: column;
   gap: 10px;
   padding: 24px;
-  border-radius: 14px;
-  background: rgba(18, 18, 20, 0.7);
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
 }
 
 .pause__btn {
@@ -172,12 +177,12 @@ canvas {
 
 .pause__btn--primary {
   border-color: transparent;
-  background: #5fb3b3;
+  background: var(--brand);
   color: #0a0a0a;
 }
 
 .pause__btn--primary:hover {
-  background: #6fc3c3;
+  background: var(--brand-hover);
 }
 
 .fallback-dot {

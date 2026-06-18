@@ -1,5 +1,5 @@
 import type { Config } from "./config";
-import { createProgram } from "./gl";
+import { advanceRingPhase, createPatternHost, deviceDpr } from "./glHost";
 import type { Pattern } from "./patterns";
 import {
   createFinishLatch,
@@ -8,7 +8,6 @@ import {
   sessionState,
   stopFadeBrightness,
 } from "./session";
-import vertSrc from "./shaders/fullscreen.vert?raw";
 
 export interface RendererHandle {
   restart: () => void; // start (or restart) a session, resetting timing to zero
@@ -35,18 +34,14 @@ export function startRenderer(
   onFinish?: () => void, // fires once at fade start (finish or stop); re-arms on restart
   onFadeComplete?: () => void, // fires once when the fade reaches full background
 ): RendererHandle | null {
-  const gl = canvas.getContext("webgl2");
-  if (!gl) return null;
-
-  const program = createProgram(gl, vertSrc, pattern.fragSrc);
-  gl.useProgram(program);
-  const bind = pattern.createBinding(gl, program);
+  const host = createPatternHost(canvas, pattern);
+  if (!host) return null;
+  const { gl } = host;
   gl.clearColor(0, 0, 0, 1);
 
   let dpr = 1;
   const resize = () => {
-    // Clamp DPR: fullscreen fragment work at DPR 3 wastes fill rate on phones.
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    dpr = deviceDpr();
     const w = Math.round(window.innerWidth * dpr);
     const h = Math.round(window.innerHeight * dpr);
     if (canvas.width !== w || canvas.height !== h) {
@@ -63,9 +58,6 @@ export function startRenderer(
   let last: number | null = null;
   let elapsed = 0; // seconds since start, for session timing
   let stopElapsed = 0; // elapsed at the moment stop() was called
-  // Ring phase advances by Δt each frame so a mid-cycle change to cycleSeconds
-  // shifts the rate going forward, not the current position — otherwise the
-  // ring teleports while the cycle slider is dragged.
   let ringPhase = 0;
   const finishLatch = createFinishLatch();
   let fadeDone = false; // one-shot guard for onFadeComplete
@@ -75,7 +67,7 @@ export function startRenderer(
     if (advancing && last !== null) {
       const dt = (now - last) / 1000;
       elapsed += dt;
-      ringPhase = (ringPhase + dt / config.cycleSeconds) % 1;
+      ringPhase = advanceRingPhase(ringPhase, dt, config.cycleSeconds);
     }
     last = now;
 
@@ -97,9 +89,8 @@ export function startRenderer(
       onFadeComplete?.();
     }
 
-    bind({ resolution: [canvas.width, canvas.height], dpr, ringPhase, config, session });
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    host.bind({ resolution: [canvas.width, canvas.height], dpr, ringPhase, config, session });
+    host.draw();
     requestAnimationFrame(frame);
   };
   requestAnimationFrame(frame);

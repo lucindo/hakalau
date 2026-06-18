@@ -140,7 +140,7 @@ function createPausePrompt(handlers: { onContinue: () => void; onStop: () => voi
   el.className = "pause screen";
 
   const card = document.createElement("div");
-  card.className = "pause__card";
+  card.className = "pause__card card";
 
   const cont = document.createElement("button");
   cont.type = "button";
