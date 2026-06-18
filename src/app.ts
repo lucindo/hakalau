@@ -101,8 +101,7 @@ export function startApp(canvas: HTMLCanvasElement, config: Config): void {
     renderer.stop(); // fade out, then onFadeComplete → config
   }
 
-  // A click during practice pauses everything; settings are reachable only from
-  // the config screen now.
+  // Settings live on the config screen; during practice a click only pauses.
   window.addEventListener("pointerdown", () => {
     if (screen !== "running") return;
     renderer.pause();
