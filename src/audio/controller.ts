@@ -1,9 +1,8 @@
 import * as Tone from "tone";
 import type { Config } from "../config";
 import { FADE_SECONDS } from "../session";
+import { createScene } from "./scene";
 
-// BASE_URL keeps the path correct under the GitHub Pages subpath.
-const OCEAN_URL = `${import.meta.env.BASE_URL}audio/ocean.mp3`;
 const FADE_IN_SECONDS = 2;
 const CONTROL_RAMP = 0.1; // smooth a live volume/mute change without a click
 
@@ -14,11 +13,11 @@ export interface AudioController {
   setMuted: (muted: boolean) => void;
 }
 
-// Walking skeleton: a single looped ocean bed behind a master gain envelope.
+// Owns the master gain envelope and session lifecycle; the scene owns the graph.
 // Tone lives here so the dynamic import keeps it out of the base bundle.
 export function createAudioController(): AudioController {
   const master = new Tone.Gain(0).toDestination();
-  const ocean = new Tone.Player({ url: OCEAN_URL, loop: true }).connect(master);
+  const scene = createScene(master);
   let target = 0; // gain to ramp toward when audible; mute parks the envelope at 0
   let muted = false;
   let started = false;
@@ -29,10 +28,10 @@ export function createAudioController(): AudioController {
       target = config.volume;
       muted = false;
       await Tone.start(); // resume the context on the user gesture
-      await Tone.loaded(); // decode the buffer before playing
-      if (started) ocean.restart();
+      await Tone.loaded(); // decode the buffers before playing
+      if (started) scene.restart();
       else {
-        ocean.start();
+        scene.start();
         started = true;
       }
       master.gain.cancelScheduledValues(Tone.now());
