@@ -38,7 +38,7 @@ export function startRenderer(canvas: HTMLCanvasElement, config: Config): boolea
     if (start === null) start = now;
     gl.uniform2f(uResolution, canvas.width, canvas.height);
     gl.uniform1f(uTime, (now - start) / 1000);
-    gl.uniform1f(uPeriod, 6); // hardcoded; wired to config.cycleSeconds next step
+    gl.uniform1f(uPeriod, config.cycleSeconds);
     gl.uniform1f(uDotSize, config.dotSize * dpr); // config px → device px
     gl.uniform1f(uDotEnabled, config.dotEnabled ? 1 : 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
