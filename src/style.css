@@ -27,42 +27,7 @@ canvas {
   color: #e8e8e8;
   font: 14px/1.4 system-ui, sans-serif;
   accent-color: #5fb3b3;
-  opacity: 0;
-  visibility: hidden;
-  transform: translate(-50%, 12px);
-  transition:
-    opacity 0.3s ease,
-    transform 0.3s ease;
-}
-
-.overlay--visible {
-  opacity: 1;
-  visibility: visible;
-  transform: translate(-50%, 0);
-}
-
-.overlay__close {
-  position: absolute;
-  top: 8px;
-  right: 10px;
-  width: 26px;
-  height: 26px;
-  padding: 0;
-  border: 0;
-  border-radius: 7px;
-  background: transparent;
-  color: #888;
-  font-size: 20px;
-  line-height: 1;
-  cursor: pointer;
-  transition:
-    color 0.2s ease,
-    background 0.2s ease;
-}
-
-.overlay__close:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(-50%);
 }
 
 .overlay__start {
@@ -125,6 +90,67 @@ canvas {
   min-width: 3ch;
   text-align: right;
   opacity: 0.7;
+}
+
+.countdown {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e8e8e8;
+  font: 200 22vmin/1 system-ui, sans-serif;
+  pointer-events: none;
+}
+
+.pause {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.pause__card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px;
+  border-radius: 14px;
+  background: rgba(18, 18, 20, 0.7);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+.pause__btn {
+  min-width: 180px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  background: transparent;
+  color: #e8e8e8;
+  font: 600 14px/1 system-ui, sans-serif;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.pause__btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.pause__btn--primary {
+  border-color: transparent;
+  background: #5fb3b3;
+  color: #0a0a0a;
+}
+
+.pause__btn--primary:hover {
+  background: #6fc3c3;
 }
 
 .fallback-dot {

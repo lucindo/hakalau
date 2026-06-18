@@ -8,7 +8,8 @@ const FADE_IN_SECONDS = 2;
 const CONTROL_RAMP = 0.1; // smooth a live volume/mute change without a click
 
 export interface AudioController {
-  start: (config: Config) => Promise<void>; // resume context (gesture) + (re)start the bed, fade in
+  arm: () => Promise<void>; // resume the context on the user gesture, before start()
+  start: (config: Config) => Promise<void>; // (re)start the bed and fade in
   finish: () => void; // fade out over FADE_SECONDS, mirroring the visual session fade
   setVolume: (volume: number) => void;
   setMuted: (muted: boolean) => void;
@@ -26,10 +27,13 @@ export function createAudioController(): AudioController {
   const audible = () => (muted ? 0 : target);
 
   return {
+    async arm() {
+      await Tone.start(); // resume the context while the gesture is still live
+    },
     async start(config) {
       target = config.volume;
       muted = false;
-      await Tone.start(); // resume the context on the user gesture
+      await Tone.start(); // idempotent; context already resumed by arm()
       await Tone.loaded(); // decode the buffers before playing
       if (started) {
         scene.restart();
