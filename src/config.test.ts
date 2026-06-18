@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { DEFAULT_CONFIG, loadConfig, saveConfig } from "./config";
+import { DEFAULT_CONFIG, hexToRgb, loadConfig, saveConfig } from "./config";
 
 function mockLocalStorage(): void {
   const store = new Map<string, string>();
@@ -44,5 +44,23 @@ describe("config persistence", () => {
   it("falls back to defaults when stored value is not an object", () => {
     localStorage.setItem("hakalau.config", "42");
     expect(loadConfig()).toEqual(DEFAULT_CONFIG);
+  });
+
+  it("keeps valid hex colors and rejects malformed ones", () => {
+    localStorage.setItem(
+      "hakalau.config",
+      JSON.stringify({ bgColor: "#1a2b3c", fgColor: "red" }),
+    );
+    const cfg = loadConfig();
+    expect(cfg.bgColor).toBe("#1a2b3c"); // valid hex → kept
+    expect(cfg.fgColor).toBe(DEFAULT_CONFIG.fgColor); // not #rrggbb → default
+  });
+});
+
+describe("hexToRgb", () => {
+  it("maps #rrggbb to 0..1 channels", () => {
+    expect(hexToRgb("#000000")).toEqual([0, 0, 0]);
+    expect(hexToRgb("#ffffff")).toEqual([1, 1, 1]);
+    expect(hexToRgb("#ff8000")).toEqual([1, 128 / 255, 0]);
   });
 });

@@ -1,16 +1,18 @@
 # Plan — Hakalau Meditation Canvas
 
 ## Now
-**State:** v1 complete on branch `ring-v1` — all 15 roadmap items done, 10 unit tests green,
-build clean (11 KB JS / 4.2 KB gz). Decisions in `.project/DECISIONS.md`, spec in `.project/SPEC.md`.
-Tuned defaults set: cycle 25 s, rounds 0 (endless), dot on @ 5 px, softness 0.1.
+**State:** v1 live at https://lucindo.github.io/hakalau/. Post-v1 polish landed and ready to deploy:
+continuous ring-phase accumulator (cycle slider no longer jolts the ring); panel UX (close button +
+Esc, slide-in, frosted look); user-selectable background + dot/ring colors with a preset dropdown
+(Black/White default, Kutastha indigo+gold, low-contrast options). 12 unit tests green, build ~5 KB
+JS gz. `.project/` refreshed for the new config fields and `presets.ts`.
 
-**Next:** open PR `ring-v1` → `main`; after merge, enable GitHub Pages (Settings → Pages →
-Source: GitHub Actions) so the deploy workflow publishes to https://lucindo.github.io/hakalau/.
+**Next:** push to `main` → Pages deploys automatically. Then pick a post-v1 item below.
 
-**Open questions / deferred (post-v1):** audio (3D nature/ocean — keep session start/stop as the
-hook); concurrent rings (ring-count param already in shader, fixed at 1); hyperspace/warp pattern
-(add via the pattern registry); tune defaults further by feel.
+**Open questions / deferred (post-v1):** session end fades to black regardless of bg color (could
+fade to chosen bg — one-line shader change); audio (3D nature/ocean — session start/stop is the
+hook); concurrent rings (ring-count param in shader, fixed at 1); hyperspace/warp pattern (add via
+`src/patterns/` registry); further default tuning by feel.
 
 ## Roadmap
 
@@ -29,3 +31,7 @@ hook); concurrent rings (ring-count param already in shader, fixed at 1); hypers
 - [x] Pattern registered behind a pluggable interface (host owns GL/loop/session); expanding-ring is the only pattern
 - [x] Vitest covers config validation/persistence and session/round logic
 - [x] Builds with base '/hakalau/' and deploys to GitHub Pages
+- [x] Ring driven by a continuous phase accumulator — cycle changes alter rate, not position
+- [x] Panel polish: close button + Esc, slide-in transition, frosted/cleaner look
+- [x] User-selectable background and dot/ring colors, persisted and validated
+- [x] Color preset dropdown (Black/White default, Kutastha, low-contrast options)

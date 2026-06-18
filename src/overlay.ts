@@ -1,4 +1,5 @@
 import { type Config, saveConfig } from "./config";
+import { COLOR_PRESETS } from "./presets";
 
 // Settings panel. Hidden during practice; revealed by deliberate input
 // (click/tap or key) and auto-hidden after inactivity. Mouse-move must NOT
@@ -10,6 +11,13 @@ const AUTO_HIDE_MS = 3000;
 export function createOverlay(config: Config): HTMLElement {
   const panel = document.createElement("div");
   panel.className = "overlay";
+
+  const closeBtn = document.createElement("button");
+  closeBtn.type = "button";
+  closeBtn.className = "overlay__close";
+  closeBtn.textContent = "×";
+  closeBtn.setAttribute("aria-label", "Close settings");
+  panel.appendChild(closeBtn);
 
   addRange(panel, "Cycle (s)", 0.5, 60, 0.5, config.cycleSeconds, (v) => {
     config.cycleSeconds = v;
@@ -31,17 +39,55 @@ export function createOverlay(config: Config): HTMLElement {
     config.ringSoftness = v;
     saveConfig(config);
   });
+  // Preset picker drives both swatches; editing a swatch flips it to "Custom".
+  const presetOptions = [
+    ...COLOR_PRESETS.map((p, i) => ({ value: String(i), label: p.name })),
+    { value: "custom", label: "Custom" },
+  ];
+  const currentPreset = () => {
+    const i = COLOR_PRESETS.findIndex((p) => p.bg === config.bgColor && p.fg === config.fgColor);
+    return i === -1 ? "custom" : String(i);
+  };
+
+  let bgInput: HTMLInputElement;
+  let fgInput: HTMLInputElement;
+
+  const presetSelect = addSelect(panel, "Preset", presetOptions, currentPreset(), (val) => {
+    const preset = COLOR_PRESETS[Number(val)];
+    if (!preset) return; // "custom" — leave the swatches as they are
+    config.bgColor = preset.bg;
+    config.fgColor = preset.fg;
+    bgInput.value = preset.bg;
+    fgInput.value = preset.fg;
+    saveConfig(config);
+  });
+
+  bgInput = addColor(panel, "Background", config.bgColor, (v) => {
+    config.bgColor = v;
+    presetSelect.value = currentPreset();
+    saveConfig(config);
+  });
+  fgInput = addColor(panel, "Dot / ring", config.fgColor, (v) => {
+    config.fgColor = v;
+    presetSelect.value = currentPreset();
+    saveConfig(config);
+  });
 
   document.body.appendChild(panel);
 
   let hideTimer = 0;
+  const hide = () => {
+    clearTimeout(hideTimer);
+    panel.classList.remove("overlay--visible");
+  };
   const show = () => {
     panel.classList.add("overlay--visible");
     clearTimeout(hideTimer);
-    hideTimer = window.setTimeout(() => panel.classList.remove("overlay--visible"), AUTO_HIDE_MS);
+    hideTimer = window.setTimeout(hide, AUTO_HIDE_MS);
   };
+  closeBtn.addEventListener("click", hide);
   window.addEventListener("pointerdown", show);
-  window.addEventListener("keydown", show);
+  window.addEventListener("keydown", (e) => (e.key === "Escape" ? hide() : show()));
   panel.addEventListener("input", show); // keep panel alive while adjusting
 
   return panel;
@@ -112,4 +158,38 @@ function addCheckbox(
   input.checked = value;
   input.addEventListener("change", () => onChange(input.checked));
   addRow(parent, label, input);
+}
+
+function addColor(
+  parent: HTMLElement,
+  label: string,
+  value: string,
+  onChange: (v: string) => void,
+): HTMLInputElement {
+  const input = document.createElement("input");
+  input.type = "color";
+  input.value = value;
+  input.addEventListener("input", () => onChange(input.value));
+  addRow(parent, label, input);
+  return input;
+}
+
+function addSelect(
+  parent: HTMLElement,
+  label: string,
+  options: ReadonlyArray<{ value: string; label: string }>,
+  value: string,
+  onChange: (v: string) => void,
+): HTMLSelectElement {
+  const select = document.createElement("select");
+  for (const opt of options) {
+    const o = document.createElement("option");
+    o.value = opt.value;
+    o.textContent = opt.label;
+    select.appendChild(o);
+  }
+  select.value = value;
+  select.addEventListener("change", () => onChange(select.value));
+  addRow(parent, label, select);
+  return select;
 }

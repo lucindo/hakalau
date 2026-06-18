@@ -31,12 +31,21 @@ export function startRenderer(canvas: HTMLCanvasElement, config: Config, pattern
   resize();
   window.addEventListener("resize", resize);
 
-  let start: number | null = null;
+  let last: number | null = null;
+  let elapsed = 0; // seconds since start, for session timing
+  // Ring phase advances by Δt each frame so a mid-cycle change to cycleSeconds
+  // shifts the rate going forward, not the current position — otherwise the
+  // ring teleports while the cycle slider is dragged.
+  let ringPhase = 0;
   const frame = (now: number) => {
-    if (start === null) start = now;
-    const time = (now - start) / 1000;
-    const session = sessionState(time, config.cycleSeconds, config.rounds, FADE_SECONDS);
-    bind({ resolution: [canvas.width, canvas.height], dpr, time, config, session });
+    if (last !== null) {
+      const dt = (now - last) / 1000;
+      elapsed += dt;
+      ringPhase = (ringPhase + dt / config.cycleSeconds) % 1;
+    }
+    last = now;
+    const session = sessionState(elapsed, config.cycleSeconds, config.rounds, FADE_SECONDS);
+    bind({ resolution: [canvas.width, canvas.height], dpr, ringPhase, config, session });
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     requestAnimationFrame(frame);

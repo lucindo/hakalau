@@ -18,14 +18,15 @@ patterns (e.g. hyperspace/warp) can be added without touching the renderer.
 | Path | Holds |
 |------|-------|
 | `src/main.ts` | Entry: loads config, starts renderer with the expanding-ring pattern, mounts overlay; falls back to a static dot if no WebGL2. |
-| `src/renderer.ts` | Pattern-agnostic host: WebGL2 context, DPR-aware sizing, render loop, session timing. |
+| `src/renderer.ts` | Pattern-agnostic host: WebGL2 context, DPR-aware sizing, render loop, session timing, continuous ring-phase accumulator. |
 | `src/session.ts` | Pure rounds/fade logic (`sessionState`); 1 round = 1 cycle, 0 = endless, fade-out on completion. |
-| `src/config.ts` | Typed `Config`, defaults, Valibot-validated localStorage load/save. |
-| `src/overlay.ts` | Settings panel: reveal on click/key (not mouse-move), auto-hide, four live controls bound to config. |
+| `src/config.ts` | Typed `Config`, defaults, Valibot-validated localStorage load/save; `hexToRgb` for GL. |
+| `src/presets.ts` | Curated background/foreground color pairs (Black/White default, Kutastha, low-contrast options). |
+| `src/overlay.ts` | Settings panel: reveal on click/key (not mouse-move), close button + Esc, auto-hide, live controls (timing, dot, ring, colors, presets) bound to config. |
 | `src/gl.ts` | Shader compile/link helpers (throw loudly on GLSL errors). |
 | `src/fallback.ts` | Static centered dot for the no-WebGL2 path. |
 | `src/patterns/` | `Pattern`/`FrameContext` interface, `expanding-ring` binding, registry (`getPattern`). |
-| `src/shaders/` | GLSL: `fullscreen.vert` (buffer-less triangle), `expanding-ring.frag` (dot + ring). |
+| `src/shaders/` | GLSL: `fullscreen.vert` (buffer-less triangle), `expanding-ring.frag` (dot + ring, bg/fg colors). |
 | `.github/workflows/deploy.yml` | CI: test → build → publish `dist/` to Pages on push to `main`. |
 | `.project/` | Durable project state: this map, `SPEC.md`, `DECISIONS.md`, `PLAN.md`. |
 

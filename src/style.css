@@ -16,28 +16,87 @@ canvas {
   position: fixed;
   bottom: 24px;
   left: 50%;
-  transform: translateX(-50%);
-  min-width: 240px;
-  padding: 16px 20px;
-  border-radius: 12px;
-  background: rgba(20, 20, 20, 0.85);
-  color: #ddd;
+  width: min(320px, calc(100vw - 32px));
+  padding: 26px 22px 18px;
+  border-radius: 14px;
+  background: rgba(18, 18, 20, 0.7);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  color: #e8e8e8;
   font: 14px/1.4 system-ui, sans-serif;
+  accent-color: #5fb3b3;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.4s ease;
+  transform: translate(-50%, 12px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
 }
 
 .overlay--visible {
   opacity: 1;
   visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+.overlay__close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #888;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.overlay__close:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .overlay__row {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 10px 0;
+  margin: 12px 0;
+}
+
+.overlay__row input[type="range"] {
+  flex: 1;
+  min-width: 0;
+}
+
+.overlay__row select {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.overlay__row input[type="color"] {
+  width: 36px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
 }
 
 .overlay__row > span:first-child {

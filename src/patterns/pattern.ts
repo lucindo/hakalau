@@ -5,7 +5,7 @@ import type { SessionState } from "../session";
 export interface FrameContext {
   resolution: readonly [number, number]; // device px
   dpr: number;
-  time: number; // seconds since start
+  ringPhase: number; // 0..1 within the current ring cycle
   config: Config;
   session: SessionState;
 }
