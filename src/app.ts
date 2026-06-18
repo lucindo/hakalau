@@ -3,6 +3,7 @@ import type { Config } from "./config";
 import { showStaticDot } from "./fallback";
 import { createConfigPanel } from "./overlay";
 import { getPattern } from "./patterns";
+import { startPreview } from "./preview";
 import { startRenderer } from "./renderer";
 
 const COUNTDOWN_FROM = 3;
@@ -25,10 +26,11 @@ export function startApp(canvas: HTMLCanvasElement, config: Config): void {
     return loading;
   };
 
+  const pattern = getPattern("expanding-ring");
   const handle = startRenderer(
     canvas,
     config,
-    getPattern("expanding-ring"),
+    pattern,
     () => {
       audio?.finish();
       if (screen === "running" || screen === "paused") setScreen("ending");
@@ -51,14 +53,21 @@ export function startApp(canvas: HTMLCanvasElement, config: Config): void {
       audio?.setVolume(config.volume);
     },
   });
+  const previewCanvas = document.createElement("canvas");
+  previewCanvas.className = "preview";
+  const configScreen = document.createElement("div");
+  configScreen.className = "config";
+  configScreen.append(panel, previewCanvas);
+
   const countdown = createCountdown();
   const pausePrompt = createPausePrompt({ onContinue: resume, onStop: stop });
-  document.body.append(panel, countdown.el, pausePrompt.el);
+  document.body.append(configScreen, countdown.el, pausePrompt.el);
+  startPreview(previewCanvas, config, pattern);
 
   let screen: Screen = "config";
   const setScreen = (next: Screen): void => {
     screen = next;
-    panel.hidden = next !== "config";
+    configScreen.hidden = next !== "config";
     countdown.el.hidden = next !== "countdown";
     pausePrompt.el.hidden = next !== "paused";
   };

@@ -8,16 +8,38 @@ body {
 
 canvas {
   display: block;
+}
+
+.stage {
+  position: fixed;
+  inset: 0;
   width: 100vw;
   height: 100vh;
 }
 
-.overlay {
+.config {
   position: fixed;
-  bottom: 24px;
-  left: 50%;
-  width: min(320px, calc(100vw - 32px));
-  padding: 26px 22px 18px;
+  inset: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.preview {
+  width: min(300px, 70vw);
+  aspect-ratio: 1;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+.overlay {
+  width: min(320px, 100%);
+  padding: 22px;
   border-radius: 14px;
   background: rgba(18, 18, 20, 0.7);
   -webkit-backdrop-filter: blur(16px);
@@ -27,7 +49,6 @@ canvas {
   color: #e8e8e8;
   font: 14px/1.4 system-ui, sans-serif;
   accent-color: #5fb3b3;
-  transform: translateX(-50%);
 }
 
 .overlay__start {
