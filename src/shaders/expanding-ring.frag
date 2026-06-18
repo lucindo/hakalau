@@ -9,7 +9,7 @@ uniform float u_dotSize;     // dot radius, device px
 uniform float u_dotEnabled;  // 0 or 1
 uniform float u_ringSoftness; // 0 crisp → 1 soft
 uniform float u_ringEnabled;  // 0 once all rounds are done
-uniform float u_brightness;   // global fade-out, 1 → 0 on completion
+uniform float u_brightness;   // foreground fade, 1 → 0 on completion
 uniform vec3 u_bgColor;       // background
 uniform vec3 u_fgColor;       // dot + ring
 
@@ -30,6 +30,7 @@ void main() {
   float edge = mix(1.5, 80.0, u_ringSoftness);
   float ring = (1.0 - smoothstep(0.0, edge, abs(d - ringR))) * u_ringEnabled;
 
-  vec3 color = mix(u_bgColor, u_fgColor, max(dot, ring));
-  fragColor = vec4(color * u_brightness, 1.0);
+  // Fade fades the foreground toward the background, not toward black.
+  vec3 color = mix(u_bgColor, u_fgColor, max(dot, ring) * u_brightness);
+  fragColor = vec4(color, 1.0);
 }

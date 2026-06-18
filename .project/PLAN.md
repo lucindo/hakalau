@@ -1,17 +1,16 @@
 # Plan — Hakalau Meditation Canvas
 
 ## Now
-**State:** v1 live at https://lucindo.github.io/hakalau/. Post-v1 polish landed and ready to deploy:
-continuous ring-phase accumulator (cycle slider no longer jolts the ring); panel UX (close button +
-Esc, slide-in, frosted look); user-selectable background + dot/ring colors with a preset dropdown
-(Black/White default, Kutastha indigo+gold, low-contrast options). 12 unit tests green, build ~5 KB
-JS gz. `.project/` refreshed for the new config fields and `presets.ts`.
+**State:** v1 + post-v1 polish live at https://lucindo.github.io/hakalau/. This session added three
+changes, committed and ready to push: session-end fade resolves to the chosen bg color (not black);
+deliberate start — the page loads idle (controls pinned, static dot, time not advancing) and a "Start
+session" button begins the run, hides the panel, and restarts after a fade-out (no page reload). 12
+unit tests green, build ~5 KB JS gz.
 
 **Next:** push to `main` → Pages deploys automatically. Then pick a post-v1 item below.
 
-**Open questions / deferred (post-v1):** session end fades to black regardless of bg color (could
-fade to chosen bg — one-line shader change); audio (3D nature/ocean — session start/stop is the
-hook); concurrent rings (ring-count param in shader, fixed at 1); hyperspace/warp pattern (add via
+**Open questions / deferred (post-v1):** audio (3D nature/ocean — session start/stop is the hook);
+concurrent rings (ring-count param in shader, fixed at 1); hyperspace/warp pattern (add via
 `src/patterns/` registry); further default tuning by feel.
 
 ## Roadmap
@@ -35,3 +34,5 @@ hook); concurrent rings (ring-count param in shader, fixed at 1); hyperspace/war
 - [x] Panel polish: close button + Esc, slide-in transition, frosted/cleaner look
 - [x] User-selectable background and dot/ring colors, persisted and validated
 - [x] Color preset dropdown (Black/White default, Kutastha, low-contrast options)
+- [x] Session-end fade resolves to the chosen background color instead of black
+- [x] Deliberate start: idle on load, "Start session" begins/restarts a session without page reload

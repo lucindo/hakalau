@@ -9,8 +9,9 @@ const config = loadConfig();
 const canvas = document.createElement("canvas");
 document.body.appendChild(canvas);
 
-if (startRenderer(canvas, config, getPattern("expanding-ring"))) {
-  createOverlay(config);
+const handle = startRenderer(canvas, config, getPattern("expanding-ring"));
+if (handle) {
+  createOverlay(config, handle.restart);
 } else {
   canvas.remove();
   showStaticDot();

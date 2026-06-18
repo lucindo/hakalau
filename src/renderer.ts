@@ -4,12 +4,20 @@ import type { Pattern } from "./patterns";
 import { FADE_SECONDS, sessionState } from "./session";
 import vertSrc from "./shaders/fullscreen.vert?raw";
 
+export interface RendererHandle {
+  restart: () => void; // start (or restart) a session, resetting timing to zero
+}
+
 // Host for a visual pattern: owns the WebGL2 context, canvas sizing, render
-// loop, and session timing. Returns false if WebGL2 is unavailable (caller
+// loop, and session timing. Returns null if WebGL2 is unavailable (caller
 // shows the fallback).
-export function startRenderer(canvas: HTMLCanvasElement, config: Config, pattern: Pattern): boolean {
+export function startRenderer(
+  canvas: HTMLCanvasElement,
+  config: Config,
+  pattern: Pattern,
+): RendererHandle | null {
   const gl = canvas.getContext("webgl2");
-  if (!gl) return false;
+  if (!gl) return null;
 
   const program = createProgram(gl, vertSrc, pattern.fragSrc);
   gl.useProgram(program);
@@ -33,12 +41,13 @@ export function startRenderer(canvas: HTMLCanvasElement, config: Config, pattern
 
   let last: number | null = null;
   let elapsed = 0; // seconds since start, for session timing
+  let started = false; // idle (static dot) until the user starts a session
   // Ring phase advances by Δt each frame so a mid-cycle change to cycleSeconds
   // shifts the rate going forward, not the current position — otherwise the
   // ring teleports while the cycle slider is dragged.
   let ringPhase = 0;
   const frame = (now: number) => {
-    if (last !== null) {
+    if (started && last !== null) {
       const dt = (now - last) / 1000;
       elapsed += dt;
       ringPhase = (ringPhase + dt / config.cycleSeconds) % 1;
@@ -51,5 +60,11 @@ export function startRenderer(canvas: HTMLCanvasElement, config: Config, pattern
     requestAnimationFrame(frame);
   };
   requestAnimationFrame(frame);
-  return true;
+  return {
+    restart: () => {
+      started = true;
+      elapsed = 0;
+      ringPhase = 0;
+    },
+  };
 }

@@ -65,6 +65,24 @@ canvas {
   background: rgba(255, 255, 255, 0.1);
 }
 
+.overlay__start {
+  display: block;
+  width: 100%;
+  margin-bottom: 6px;
+  padding: 9px;
+  border: 0;
+  border-radius: 8px;
+  background: #5fb3b3;
+  color: #0a0a0a;
+  font: 600 14px/1 system-ui, sans-serif;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.overlay__start:hover {
+  background: #6fc3c3;
+}
+
 .overlay__row {
   display: flex;
   align-items: center;

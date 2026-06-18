@@ -8,7 +8,7 @@ import { COLOR_PRESETS } from "./presets";
 // reference each frame, so changes apply live.
 const AUTO_HIDE_MS = 3000;
 
-export function createOverlay(config: Config): HTMLElement {
+export function createOverlay(config: Config, onRestart: () => void): HTMLElement {
   const panel = document.createElement("div");
   panel.className = "overlay";
 
@@ -18,6 +18,12 @@ export function createOverlay(config: Config): HTMLElement {
   closeBtn.textContent = "×";
   closeBtn.setAttribute("aria-label", "Close settings");
   panel.appendChild(closeBtn);
+
+  const startBtn = document.createElement("button");
+  startBtn.type = "button";
+  startBtn.className = "overlay__start";
+  startBtn.textContent = "Start session";
+  panel.appendChild(startBtn);
 
   addRange(panel, "Cycle (s)", 0.5, 60, 0.5, config.cycleSeconds, (v) => {
     config.cycleSeconds = v;
@@ -86,9 +92,17 @@ export function createOverlay(config: Config): HTMLElement {
     hideTimer = window.setTimeout(hide, AUTO_HIDE_MS);
   };
   closeBtn.addEventListener("click", hide);
+  // Restart timing from zero and clear the chrome so practice resumes unobstructed.
+  startBtn.addEventListener("click", () => {
+    onRestart();
+    hide();
+  });
   window.addEventListener("pointerdown", show);
   window.addEventListener("keydown", (e) => (e.key === "Escape" ? hide() : show()));
   panel.addEventListener("input", show); // keep panel alive while adjusting
+
+  // Show controls on load and leave them pinned until the user starts a session.
+  panel.classList.add("overlay--visible");
 
   return panel;
 }
