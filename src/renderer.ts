@@ -16,6 +16,7 @@ export function startRenderer(canvas: HTMLCanvasElement, config: Config): boolea
   const uPeriod = gl.getUniformLocation(program, "u_period");
   const uDotSize = gl.getUniformLocation(program, "u_dotSize");
   const uDotEnabled = gl.getUniformLocation(program, "u_dotEnabled");
+  const uRingSoftness = gl.getUniformLocation(program, "u_ringSoftness");
   gl.clearColor(0, 0, 0, 1);
 
   let dpr = 1;
@@ -41,6 +42,7 @@ export function startRenderer(canvas: HTMLCanvasElement, config: Config): boolea
     gl.uniform1f(uPeriod, config.cycleSeconds);
     gl.uniform1f(uDotSize, config.dotSize * dpr); // config px → device px
     gl.uniform1f(uDotEnabled, config.dotEnabled ? 1 : 0);
+    gl.uniform1f(uRingSoftness, config.ringSoftness);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     requestAnimationFrame(frame);

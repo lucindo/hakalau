@@ -8,6 +8,7 @@ uniform float u_time;        // seconds since start
 uniform float u_period;      // seconds per ring cycle
 uniform float u_dotSize;     // dot radius, device px
 uniform float u_dotEnabled;  // 0 or 1
+uniform float u_ringSoftness; // 0 crisp → 1 soft
 
 out vec4 fragColor;
 
@@ -22,8 +23,9 @@ void main() {
   // Ring radius sweeps 0 → farthest corner over one period, then wraps.
   float maxR = length(u_resolution * 0.5);
   float ringR = fract(u_time / u_period) * maxR;
-  float ringWidth = 3.0; // device px; configurable softness lands next step
-  float ring = 1.0 - smoothstep(ringWidth, ringWidth + 2.0, abs(d - ringR));
+  // Edge falloff: crisp ~1.5px line at softness 0, broad glow at softness 1.
+  float edge = mix(1.5, 80.0, u_ringSoftness);
+  float ring = 1.0 - smoothstep(0.0, edge, abs(d - ringR));
 
   fragColor = vec4(vec3(max(dot, ring)), 1.0);
 }
