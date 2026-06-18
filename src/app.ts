@@ -56,7 +56,7 @@ export function startApp(canvas: HTMLCanvasElement, config: Config): void {
   const previewCanvas = document.createElement("canvas");
   previewCanvas.className = "preview";
   const configScreen = document.createElement("div");
-  configScreen.className = "config";
+  configScreen.className = "config screen";
   configScreen.append(panel, previewCanvas);
 
   const countdown = createCountdown();
@@ -67,9 +67,9 @@ export function startApp(canvas: HTMLCanvasElement, config: Config): void {
   let screen: Screen = "config";
   const setScreen = (next: Screen): void => {
     screen = next;
-    configScreen.hidden = next !== "config";
-    countdown.el.hidden = next !== "countdown";
-    pausePrompt.el.hidden = next !== "paused";
+    configScreen.classList.toggle("screen--on", next === "config");
+    countdown.el.classList.toggle("screen--on", next === "countdown");
+    pausePrompt.el.classList.toggle("screen--on", next === "paused");
   };
   setScreen("config");
 
@@ -113,8 +113,7 @@ export function startApp(canvas: HTMLCanvasElement, config: Config): void {
 
 function createCountdown(): { el: HTMLElement; run: (from: number, done: () => void) => void } {
   const el = document.createElement("div");
-  el.className = "countdown";
-  el.hidden = true;
+  el.className = "countdown screen";
   return {
     el,
     run(from, done) {
@@ -138,8 +137,7 @@ function createPausePrompt(handlers: { onContinue: () => void; onStop: () => voi
   el: HTMLElement;
 } {
   const el = document.createElement("div");
-  el.className = "pause";
-  el.hidden = true;
+  el.className = "pause screen";
 
   const card = document.createElement("div");
   card.className = "pause__card";

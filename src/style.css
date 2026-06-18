@@ -10,10 +10,26 @@ canvas {
   display: block;
 }
 
-/* A display rule (flex on .config/.pause/.countdown) outranks the UA [hidden]
-   rule, so the attribute is inert without this. */
-[hidden] {
-  display: none !important;
+/* Full-screen overlays that gently crossfade in/out. The app toggles
+   .screen--on; hidden screens drop pointer-events so they don't block. */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.5s ease,
+    visibility 0.5s ease;
+}
+
+.screen--on {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .stage {
@@ -24,12 +40,7 @@ canvas {
 }
 
 .config {
-  position: fixed;
-  inset: 0;
-  display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
   gap: 22px;
   padding: 20px;
   box-sizing: border-box;
@@ -120,22 +131,11 @@ canvas {
 }
 
 .countdown {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   color: #e8e8e8;
   font: 200 22vmin/1 system-ui, sans-serif;
-  pointer-events: none;
 }
 
 .pause {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background: rgba(0, 0, 0, 0.4);
 }
 
