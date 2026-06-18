@@ -1,19 +1,19 @@
 # Plan — Hakalau Meditation Canvas
 
 ## Now
-**State:** Audio layer built end-to-end (per D12) and committed — 16 unpushed commits ahead of
-`origin/main`. Self-contained Tone.js subsystem under `src/audio/`, dynamically imported only when
-Sound is enabled (base bundle stays 5.84 KB gz; Tone in a separate ~64 KB chunk). Ocean wide bed +
-HRTF birds/wind + a slow generative pentatonic pad, faded in on start and out on session end via the
-renderer's one-shot `onFinish`. 15 unit tests green, tsc clean. README rewritten.
+**State:** Audio layer shipped (per D12) — all pushed to `origin/main` (`cd26fc6`), Pages deploying.
+Self-contained Tone.js subsystem under `src/audio/`, dynamically imported only when Sound is enabled
+(base bundle 5.84 KB gz; Tone in a separate ~64 KB chunk). Ocean wide bed + HRTF birds/wind + slow
+generative pentatonic pad, fading with the session via the renderer's one-shot `onFinish`. Two
+overlay fixes also landed: panel stays open while hovered, and closes cleanly on Start. 15 tests
+green, README written.
 
-**Next:** push `main` → Pages deploys automatically.
+**Next:** listen on the deployed site and decide if the mix needs another by-ear pass.
 
-**Open questions / deferred:** mix levels are by-ear (current: nature bus 0.22, melody −6 dB,
-velocity 0.55–0.80) — may want more tuning once heard on the deployed site; loop seams aren't
-crossfade-seamless; **leaves** stream deferred (no clean CC0/PD isolate found); headphones hint
-dropped. Other post-v1 items untouched: concurrent rings (ring-count param, fixed at 1),
-hyperspace/warp pattern via `src/patterns/`.
+**Open questions / deferred:** mix levels by-ear (nature bus 0.22, melody −6 dB, velocity
+0.55–0.80); loop seams aren't crossfade-seamless; **leaves** stream deferred (no clean CC0/PD
+isolate); headphones hint dropped. Untouched post-v1 items: concurrent rings (ring-count param,
+fixed at 1), hyperspace/warp pattern via `src/patterns/`.
 
 ## Roadmap
 
