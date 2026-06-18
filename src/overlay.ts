@@ -84,7 +84,7 @@ export function createOverlay(config: Config, handlers: OverlayHandlers): HTMLEl
     saveConfig(config);
   });
 
-  addCheckbox(panel, "Audio", config.audioEnabled, (v) => {
+  addCheckbox(panel, "Sound", config.audioEnabled, (v) => {
     config.audioEnabled = v;
     saveConfig(config);
     handlers.onAudioChange();
