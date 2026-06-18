@@ -116,6 +116,9 @@ export function createOverlay(config: Config, handlers: OverlayHandlers): HTMLEl
   window.addEventListener("pointerdown", show);
   window.addEventListener("keydown", (e) => (e.key === "Escape" ? hide() : show()));
   panel.addEventListener("input", show); // keep panel alive while adjusting
+  // Don't time out while the pointer rests on the panel (e.g. reading the options).
+  panel.addEventListener("pointerenter", () => clearTimeout(hideTimer));
+  panel.addEventListener("pointerleave", show);
 
   // Show controls on load and leave them pinned until the user starts a session.
   panel.classList.add("overlay--visible");
