@@ -12,6 +12,8 @@ export function startRenderer(canvas: HTMLCanvasElement, config: Config): boolea
   const program = createProgram(gl, vertSrc, fragSrc);
   gl.useProgram(program);
   const uResolution = gl.getUniformLocation(program, "u_resolution");
+  const uTime = gl.getUniformLocation(program, "u_time");
+  const uPeriod = gl.getUniformLocation(program, "u_period");
   const uDotSize = gl.getUniformLocation(program, "u_dotSize");
   const uDotEnabled = gl.getUniformLocation(program, "u_dotEnabled");
   gl.clearColor(0, 0, 0, 1);
@@ -31,8 +33,12 @@ export function startRenderer(canvas: HTMLCanvasElement, config: Config): boolea
   resize();
   window.addEventListener("resize", resize);
 
-  const frame = () => {
+  let start: number | null = null;
+  const frame = (now: number) => {
+    if (start === null) start = now;
     gl.uniform2f(uResolution, canvas.width, canvas.height);
+    gl.uniform1f(uTime, (now - start) / 1000);
+    gl.uniform1f(uPeriod, 6); // hardcoded; wired to config.cycleSeconds next step
     gl.uniform1f(uDotSize, config.dotSize * dpr); // config px → device px
     gl.uniform1f(uDotEnabled, config.dotEnabled ? 1 : 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
