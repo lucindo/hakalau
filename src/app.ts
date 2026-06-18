@@ -75,6 +75,10 @@ export function startApp(canvas: HTMLCanvasElement, config: Config): void {
 
   function startCountdown(): void {
     if (config.audioEnabled) void ensureAudio().then((a) => a.arm());
+    // Cover the idle dot with the session background so the numeral stands
+    // alone; matching bg makes the cut into the running session seamless.
+    countdown.el.style.background = config.bgColor;
+    countdown.el.style.color = config.fgColor;
     setScreen("countdown");
     countdown.run(COUNTDOWN_FROM, begin);
   }
