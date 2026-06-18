@@ -1,17 +1,19 @@
 # Plan — Hakalau Meditation Canvas
 
 ## Now
-**State:** v1 + post-v1 polish live at https://lucindo.github.io/hakalau/. This session added three
-changes, committed and ready to push: session-end fade resolves to the chosen bg color (not black);
-deliberate start — the page loads idle (controls pinned, static dot, time not advancing) and a "Start
-session" button begins the run, hides the panel, and restarts after a fade-out (no page reload). 12
-unit tests green, build ~5 KB JS gz.
+**State:** Audio layer built end-to-end (per D12) and committed — 16 unpushed commits ahead of
+`origin/main`. Self-contained Tone.js subsystem under `src/audio/`, dynamically imported only when
+Sound is enabled (base bundle stays 5.84 KB gz; Tone in a separate ~64 KB chunk). Ocean wide bed +
+HRTF birds/wind + a slow generative pentatonic pad, faded in on start and out on session end via the
+renderer's one-shot `onFinish`. 15 unit tests green, tsc clean. README rewritten.
 
-**Next:** push to `main` → Pages deploys automatically. Then pick a post-v1 item below.
+**Next:** push `main` → Pages deploys automatically.
 
-**Open questions / deferred (post-v1):** audio (3D nature/ocean — session start/stop is the hook);
-concurrent rings (ring-count param in shader, fixed at 1); hyperspace/warp pattern (add via
-`src/patterns/` registry); further default tuning by feel.
+**Open questions / deferred:** mix levels are by-ear (current: nature bus 0.22, melody −6 dB,
+velocity 0.55–0.80) — may want more tuning once heard on the deployed site; loop seams aren't
+crossfade-seamless; **leaves** stream deferred (no clean CC0/PD isolate found); headphones hint
+dropped. Other post-v1 items untouched: concurrent rings (ring-count param, fixed at 1),
+hyperspace/warp pattern via `src/patterns/`.
 
 ## Roadmap
 
