@@ -1,3 +1,10 @@
+:root {
+  --brand: #5fb3b3;
+  --brand-hover: #6fc3c3;
+  --hairline: 1px solid rgba(255, 255, 255, 0.08);
+  --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
 html,
 body {
   margin: 0;
@@ -6,63 +13,70 @@ body {
   overflow: hidden;
 }
 
-canvas {
-  display: block;
-  width: 100vw;
-  height: 100vh;
-}
-
-.overlay {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  width: min(320px, calc(100vw - 32px));
-  padding: 26px 22px 18px;
+/* Frosted panel treatment shared by the config and pause cards. */
+.card {
   border-radius: 14px;
   background: rgba(18, 18, 20, 0.7);
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
-  color: #e8e8e8;
-  font: 14px/1.4 system-ui, sans-serif;
-  accent-color: #5fb3b3;
+  border: var(--hairline);
+  box-shadow: var(--card-shadow);
+}
+
+canvas {
+  display: block;
+}
+
+/* Full-screen overlays that gently crossfade in/out. The app toggles
+   .screen--on; hidden screens drop pointer-events so they don't block. */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   opacity: 0;
   visibility: hidden;
-  transform: translate(-50%, 12px);
+  pointer-events: none;
   transition:
-    opacity 0.3s ease,
-    transform 0.3s ease;
+    opacity 0.5s ease,
+    visibility 0.5s ease;
 }
 
-.overlay--visible {
+.screen--on {
   opacity: 1;
   visibility: visible;
-  transform: translate(-50%, 0);
+  pointer-events: auto;
 }
 
-.overlay__close {
-  position: absolute;
-  top: 8px;
-  right: 10px;
-  width: 26px;
-  height: 26px;
-  padding: 0;
-  border: 0;
-  border-radius: 7px;
-  background: transparent;
-  color: #888;
-  font-size: 20px;
-  line-height: 1;
-  cursor: pointer;
-  transition:
-    color 0.2s ease,
-    background 0.2s ease;
+.stage {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
 }
 
-.overlay__close:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.1);
+.config {
+  flex-wrap: wrap;
+  gap: 22px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.preview {
+  width: min(300px, 70vw);
+  aspect-ratio: 1;
+  border-radius: 14px;
+  border: var(--hairline);
+  box-shadow: var(--card-shadow);
+}
+
+.overlay {
+  width: min(320px, 100%);
+  padding: 22px;
+  color: #e8e8e8;
+  font: 14px/1.4 system-ui, sans-serif;
+  accent-color: var(--brand);
 }
 
 .overlay__start {
@@ -72,7 +86,7 @@ canvas {
   padding: 9px;
   border: 0;
   border-radius: 8px;
-  background: #5fb3b3;
+  background: var(--brand);
   color: #0a0a0a;
   font: 600 14px/1 system-ui, sans-serif;
   cursor: pointer;
@@ -80,7 +94,7 @@ canvas {
 }
 
 .overlay__start:hover {
-  background: #6fc3c3;
+  background: var(--brand-hover);
 }
 
 .overlay__row {
@@ -125,6 +139,50 @@ canvas {
   min-width: 3ch;
   text-align: right;
   opacity: 0.7;
+}
+
+.countdown {
+  color: #e8e8e8;
+  font: 200 22vmin/1 system-ui, sans-serif;
+}
+
+.pause {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.pause__card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px;
+}
+
+.pause__btn {
+  min-width: 180px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  background: transparent;
+  color: #e8e8e8;
+  font: 600 14px/1 system-ui, sans-serif;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.pause__btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.pause__btn--primary {
+  border-color: transparent;
+  background: var(--brand);
+  color: #0a0a0a;
+}
+
+.pause__btn--primary:hover {
+  background: var(--brand-hover);
 }
 
 .fallback-dot {

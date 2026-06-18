@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createFinishLatch, sessionState } from "./session";
+import { createFinishLatch, sessionState, stopFadeBrightness } from "./session";
 
 const PERIOD = 6;
 const FADE = 2;
@@ -40,6 +40,15 @@ describe("sessionState", () => {
     expect(sessionState(PERIOD * 3 + FADE / 2, PERIOD, 3, FADE).brightness).toBeCloseTo(0.5);
     expect(sessionState(PERIOD * 3 + FADE, PERIOD, 3, FADE).brightness).toBe(0);
     expect(sessionState(PERIOD * 3 + FADE * 5, PERIOD, 3, FADE).brightness).toBe(0); // clamped
+  });
+});
+
+describe("stopFadeBrightness", () => {
+  it("fades 1 → 0 over fadeSeconds and clamps", () => {
+    expect(stopFadeBrightness(0, FADE)).toBe(1);
+    expect(stopFadeBrightness(FADE / 2, FADE)).toBeCloseTo(0.5);
+    expect(stopFadeBrightness(FADE, FADE)).toBe(0);
+    expect(stopFadeBrightness(FADE * 3, FADE)).toBe(0); // clamped
   });
 });
 

@@ -1,19 +1,21 @@
 # Plan — Hakalau Meditation Canvas
 
 ## Now
-**State:** Audio layer built end-to-end (per D12) and committed — 16 unpushed commits ahead of
-`origin/main`. Self-contained Tone.js subsystem under `src/audio/`, dynamically imported only when
-Sound is enabled (base bundle stays 5.84 KB gz; Tone in a separate ~64 KB chunk). Ocean wide bed +
-HRTF birds/wind + a slow generative pentatonic pad, faded in on start and out on session end via the
-renderer's one-shot `onFinish`. 15 unit tests green, tsc clean. README rewritten.
+**State:** Session-flow rework done on branch `session-flow` (8 commits, not yet pushed). Replaced
+the auto-hiding side panel with an explicit screen state machine in `src/app.ts`: config (settings +
+boxed live preview) → 3·2·1 countdown → running → click-to-pause (Continue/Stop) → fade → back to
+config. Renderer gained `pause/resume/stop` + `onFadeComplete`; `src/preview.ts` runs a second WebGL2
+context for the live preview; GL bootstrap/DPR/phase deduped into `src/glHost.ts`; CSS crossfades via
+`.screen`, shared `.card` + `--brand` tokens. Audio gained `arm()` to resume the context on the Start
+gesture (session start is 3s later, past the gesture window). Code-review (risk: low) + deslop passes
+done. 16 tests green, build clean, base bundle 6.53 KB gz.
 
-**Next:** push `main` → Pages deploys automatically.
+**Next:** push `session-flow` and open a PR to `main` (CI deploys to Pages on merge).
 
-**Open questions / deferred:** mix levels are by-ear (current: nature bus 0.22, melody −6 dB,
-velocity 0.55–0.80) — may want more tuning once heard on the deployed site; loop seams aren't
-crossfade-seamless; **leaves** stream deferred (no clean CC0/PD isolate found); headphones hint
-dropped. Other post-v1 items untouched: concurrent rings (ring-count param, fixed at 1),
-hyperspace/warp pattern via `src/patterns/`.
+**Open questions / deferred:** preview dot/ring render bold (absolute device-px) — left as-is, faithful
+scaling needs a shader change; final visual pass on countdown/pause feel pending user. Carried over:
+mix levels by-ear; loop seams not crossfade-seamless; **leaves** stream deferred; concurrent rings and
+hyperspace/warp pattern still untouched post-v1.
 
 ## Roadmap
 
@@ -49,3 +51,13 @@ hyperspace/warp pattern via `src/patterns/`.
 - [~] Headphones-recommended hint on the start screen — dropped (not wanted)
 - [x] Generative melody layer under the streams (bounded scale, slow, no hooks)
 - [x] Source CC0/royalty-free samples and bundle as static same-origin assets (ocean CC0, birds/wind PD; leaves pending)
+
+### Session flow rework (branch `session-flow`)
+- [x] Renderer lifecycle: `pause`/`resume`/`stop` (early fade) + `onFadeComplete`; idle frame = dot only
+- [x] App screen state machine in `src/app.ts`: config → countdown → running → paused → fade → config
+- [x] 3·2·1 countdown over the session background (themed, no dot bleed-through)
+- [x] Click-to-pause mid-session with Continue (or backdrop) / Stop; pause mutes audio
+- [x] Boxed live preview (`src/preview.ts`, second WebGL2 context) beside the controls
+- [x] Audio `arm()` resumes the context on the Start gesture, before the post-countdown `start()`
+- [x] Crossfades between screens (`.screen`); single-source `glHost.ts`, `.card`/`--brand` tokens
+- [ ] Push branch + open PR to `main`

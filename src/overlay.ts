@@ -1,28 +1,18 @@
 import { type Config, saveConfig } from "./config";
 import { COLOR_PRESETS } from "./presets";
 
-// Settings panel. Hidden during practice; revealed by deliberate input
-// (click/tap or key) and auto-hidden after inactivity. Mouse-move must NOT
-// reveal it — that would flicker the chrome constantly during practice.
-// Controls mutate the shared config in place; the renderer reads it by
-// reference each frame, so changes apply live.
-const AUTO_HIDE_MS = 3000;
+// Config panel for the home screen. The app state machine owns its visibility;
+// this just builds the controls and the Start button. Controls mutate the
+// shared config in place, so the live preview reads changes by reference.
 
 export interface OverlayHandlers {
   onStart: () => void; // "Start session" pressed
   onAudioChange: () => void; // audio enable/volume edited (already persisted)
 }
 
-export function createOverlay(config: Config, handlers: OverlayHandlers): HTMLElement {
+export function createConfigPanel(config: Config, handlers: OverlayHandlers): HTMLElement {
   const panel = document.createElement("div");
-  panel.className = "overlay";
-
-  const closeBtn = document.createElement("button");
-  closeBtn.type = "button";
-  closeBtn.className = "overlay__close";
-  closeBtn.textContent = "×";
-  closeBtn.setAttribute("aria-label", "Close settings");
-  panel.appendChild(closeBtn);
+  panel.className = "overlay card";
 
   const startBtn = document.createElement("button");
   startBtn.type = "button";
@@ -95,38 +85,7 @@ export function createOverlay(config: Config, handlers: OverlayHandlers): HTMLEl
     handlers.onAudioChange();
   });
 
-  document.body.appendChild(panel);
-
-  let hideTimer = 0;
-  const hide = () => {
-    clearTimeout(hideTimer);
-    panel.classList.remove("overlay--visible");
-  };
-  const armHide = () => {
-    clearTimeout(hideTimer);
-    hideTimer = window.setTimeout(hide, AUTO_HIDE_MS);
-  };
-  const show = () => {
-    panel.classList.add("overlay--visible");
-    armHide();
-  };
-  closeBtn.addEventListener("click", hide);
-  // Restart timing from zero and clear the chrome so practice resumes unobstructed.
-  startBtn.addEventListener("click", () => {
-    handlers.onStart();
-    hide();
-  });
-  window.addEventListener("pointerdown", show);
-  window.addEventListener("keydown", (e) => (e.key === "Escape" ? hide() : show()));
-  panel.addEventListener("input", show); // keep panel alive while adjusting
-  // Don't time out while the pointer rests on the panel (e.g. reading the options).
-  panel.addEventListener("pointerenter", () => clearTimeout(hideTimer));
-  // Re-arm the countdown on leave, but don't re-reveal — otherwise closing the
-  // panel (Start/close) slides it out from under the pointer and pops it back.
-  panel.addEventListener("pointerleave", armHide);
-
-  // Show controls on load and leave them pinned until the user starts a session.
-  panel.classList.add("overlay--visible");
+  startBtn.addEventListener("click", () => handlers.onStart());
 
   return panel;
 }

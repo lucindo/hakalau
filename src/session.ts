@@ -24,6 +24,12 @@ export function sessionState(
   return { cyclesDone, ringActive: false, finished: true, brightness };
 }
 
+// Linear fade from 1 to 0 over fadeSeconds, used when the user stops a session
+// early (rounds === 0 is endless, so there's no natural completion to ride).
+export function stopFadeBrightness(sinceStopSeconds: number, fadeSeconds: number): number {
+  return Math.max(0, 1 - sinceStopSeconds / fadeSeconds);
+}
+
 // One-shot latch on session completion: check() returns true only on the first
 // frame finished goes true, so the host can trigger end effects (audio fade)
 // once instead of every frame. reset() re-arms it for the next session.
