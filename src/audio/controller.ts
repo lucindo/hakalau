@@ -1,6 +1,7 @@
 import * as Tone from "tone";
 import type { Config } from "../config";
 import { FADE_SECONDS } from "../session";
+import { createMelody } from "./melody";
 import { createScene } from "./scene";
 
 const FADE_IN_SECONDS = 2;
@@ -18,6 +19,7 @@ export interface AudioController {
 export function createAudioController(): AudioController {
   const master = new Tone.Gain(0).toDestination();
   const scene = createScene(master);
+  const melody = createMelody(master);
   let target = 0; // gain to ramp toward when audible; mute parks the envelope at 0
   let muted = false;
   let started = false;
@@ -29,9 +31,12 @@ export function createAudioController(): AudioController {
       muted = false;
       await Tone.start(); // resume the context on the user gesture
       await Tone.loaded(); // decode the buffers before playing
-      if (started) scene.restart();
-      else {
+      if (started) {
+        scene.restart();
+        melody.restart();
+      } else {
         scene.start();
+        melody.start();
         started = true;
       }
       master.gain.cancelScheduledValues(Tone.now());

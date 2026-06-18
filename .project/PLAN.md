@@ -43,7 +43,7 @@ concurrent rings (ring-count param in shader, fixed at 1); hyperspace/warp patte
 - [x] Overlay exposes audio enable toggle + volume; persist (live push lands with controller)
 - [x] First enabled start dynamically loads Tone + audio controller (base bundle unchanged when off)
 - [x] Walking skeleton: one looped nature sample fades in on start, fades out mirroring session fade
-- [ ] Multi-stream nature bed: ocean/wind/birds/leaves, each HRTF-positioned, ≤1 slow drift
-- [ ] Headphones-recommended hint on the start screen
+- [x] Multi-stream nature bed: ocean (wide floor) + HRTF birds (drifting) + wind; leaves deferred (no clean CC0 isolate)
+- [~] Headphones-recommended hint on the start screen — dropped (not wanted)
 - [ ] Generative melody layer under the streams (bounded scale, slow, no hooks)
 - [ ] Source CC0/royalty-free samples and bundle as static same-origin assets
