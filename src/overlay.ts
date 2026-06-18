@@ -79,6 +79,15 @@ export function createOverlay(config: Config, onRestart: () => void): HTMLElemen
     saveConfig(config);
   });
 
+  addCheckbox(panel, "Audio", config.audioEnabled, (v) => {
+    config.audioEnabled = v;
+    saveConfig(config);
+  });
+  addRange(panel, "Volume", 0, 1, 0.01, config.volume, (v) => {
+    config.volume = v;
+    saveConfig(config);
+  });
+
   document.body.appendChild(panel);
 
   let hideTimer = 0;

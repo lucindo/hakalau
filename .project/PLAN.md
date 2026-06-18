@@ -39,7 +39,7 @@ concurrent rings (ring-count param in shader, fixed at 1); hyperspace/warp patte
 
 ### Audio layer (per D12 / blueprint)
 - [x] Renderer emits a one-shot `onFinish` on session completion; re-arms on restart
-- [ ] Config persists `audioEnabled` (default off) and `volume`, validated with fallbacks
+- [x] Config persists `audioEnabled` (default off) and `volume`, validated with fallbacks
 - [ ] Overlay exposes audio enable toggle + volume; changes apply live and persist
 - [ ] First enabled start dynamically loads Tone + audio controller (base bundle unchanged when off)
 - [ ] Walking skeleton: one looped nature sample fades in on start, fades out mirroring session fade
