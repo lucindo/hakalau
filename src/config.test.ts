@@ -46,6 +46,17 @@ describe("config persistence", () => {
     expect(loadConfig()).toEqual(DEFAULT_CONFIG);
   });
 
+  it("defaults audio off and clamps out-of-range volume", () => {
+    expect(DEFAULT_CONFIG.audioEnabled).toBe(false);
+    localStorage.setItem(
+      "hakalau.config",
+      JSON.stringify({ audioEnabled: true, volume: 5 }),
+    );
+    const cfg = loadConfig();
+    expect(cfg.audioEnabled).toBe(true); // valid → kept
+    expect(cfg.volume).toBe(DEFAULT_CONFIG.volume); // out of range → default
+  });
+
   it("keeps valid hex colors and rejects malformed ones", () => {
     localStorage.setItem(
       "hakalau.config",

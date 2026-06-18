@@ -12,6 +12,8 @@ const ConfigSchema = v.object({
   ringSoftness: v.fallback(v.pipe(v.number(), v.minValue(0), v.maxValue(1)), 0.1),
   bgColor: v.fallback(hexColor, "#000000"),
   fgColor: v.fallback(hexColor, "#ffffff"),
+  audioEnabled: v.fallback(v.boolean(), false),
+  volume: v.fallback(v.pipe(v.number(), v.minValue(0), v.maxValue(1)), 0.7),
 });
 
 export type Config = v.InferOutput<typeof ConfigSchema>;

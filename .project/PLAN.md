@@ -38,7 +38,7 @@ concurrent rings (ring-count param in shader, fixed at 1); hyperspace/warp patte
 - [x] Deliberate start: idle on load, "Start session" begins/restarts a session without page reload
 
 ### Audio layer (per D12 / blueprint)
-- [ ] Renderer emits a one-shot `onFinish` on session completion; re-arms on restart
+- [x] Renderer emits a one-shot `onFinish` on session completion; re-arms on restart
 - [ ] Config persists `audioEnabled` (default off) and `volume`, validated with fallbacks
 - [ ] Overlay exposes audio enable toggle + volume; changes apply live and persist
 - [ ] First enabled start dynamically loads Tone + audio controller (base bundle unchanged when off)
