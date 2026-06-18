@@ -8,7 +8,12 @@ import { COLOR_PRESETS } from "./presets";
 // reference each frame, so changes apply live.
 const AUTO_HIDE_MS = 3000;
 
-export function createOverlay(config: Config, onRestart: () => void): HTMLElement {
+export interface OverlayHandlers {
+  onStart: () => void; // "Start session" pressed
+  onAudioChange: () => void; // audio enable/volume edited (already persisted)
+}
+
+export function createOverlay(config: Config, handlers: OverlayHandlers): HTMLElement {
   const panel = document.createElement("div");
   panel.className = "overlay";
 
@@ -82,10 +87,12 @@ export function createOverlay(config: Config, onRestart: () => void): HTMLElemen
   addCheckbox(panel, "Audio", config.audioEnabled, (v) => {
     config.audioEnabled = v;
     saveConfig(config);
+    handlers.onAudioChange();
   });
   addRange(panel, "Volume", 0, 1, 0.01, config.volume, (v) => {
     config.volume = v;
     saveConfig(config);
+    handlers.onAudioChange();
   });
 
   document.body.appendChild(panel);
@@ -103,7 +110,7 @@ export function createOverlay(config: Config, onRestart: () => void): HTMLElemen
   closeBtn.addEventListener("click", hide);
   // Restart timing from zero and clear the chrome so practice resumes unobstructed.
   startBtn.addEventListener("click", () => {
-    onRestart();
+    handlers.onStart();
     hide();
   });
   window.addEventListener("pointerdown", show);
