@@ -9,7 +9,7 @@ const canvas = document.createElement("canvas");
 document.body.appendChild(canvas);
 
 if (startRenderer(canvas, config)) {
-  createOverlay();
+  createOverlay(config);
 } else {
   canvas.remove();
   showStaticDot();
