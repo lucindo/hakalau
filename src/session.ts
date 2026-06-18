@@ -23,3 +23,22 @@ export function sessionState(
   const brightness = Math.max(0, 1 - sinceEnd / fadeSeconds);
   return { cyclesDone, ringActive: false, finished: true, brightness };
 }
+
+// One-shot latch on session completion: check() returns true only on the first
+// frame finished goes true, so the host can trigger end effects (audio fade)
+// once instead of every frame. reset() re-arms it for the next session.
+export function createFinishLatch(): { check: (finished: boolean) => boolean; reset: () => void } {
+  let fired = false;
+  return {
+    check(finished) {
+      if (finished && !fired) {
+        fired = true;
+        return true;
+      }
+      return false;
+    },
+    reset() {
+      fired = false;
+    },
+  };
+}

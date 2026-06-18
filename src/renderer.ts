@@ -1,7 +1,7 @@
 import type { Config } from "./config";
 import { createProgram } from "./gl";
 import type { Pattern } from "./patterns";
-import { FADE_SECONDS, sessionState } from "./session";
+import { createFinishLatch, FADE_SECONDS, sessionState } from "./session";
 import vertSrc from "./shaders/fullscreen.vert?raw";
 
 export interface RendererHandle {
@@ -15,6 +15,7 @@ export function startRenderer(
   canvas: HTMLCanvasElement,
   config: Config,
   pattern: Pattern,
+  onFinish?: () => void, // fires once when a finite session completes; re-arms on restart
 ): RendererHandle | null {
   const gl = canvas.getContext("webgl2");
   if (!gl) return null;
@@ -46,6 +47,7 @@ export function startRenderer(
   // shifts the rate going forward, not the current position — otherwise the
   // ring teleports while the cycle slider is dragged.
   let ringPhase = 0;
+  const finishLatch = createFinishLatch();
   const frame = (now: number) => {
     if (started && last !== null) {
       const dt = (now - last) / 1000;
@@ -54,6 +56,7 @@ export function startRenderer(
     }
     last = now;
     const session = sessionState(elapsed, config.cycleSeconds, config.rounds, FADE_SECONDS);
+    if (finishLatch.check(session.finished)) onFinish?.();
     bind({ resolution: [canvas.width, canvas.height], dpr, ringPhase, config, session });
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -65,6 +68,7 @@ export function startRenderer(
       started = true;
       elapsed = 0;
       ringPhase = 0;
+      finishLatch.reset();
     },
   };
 }

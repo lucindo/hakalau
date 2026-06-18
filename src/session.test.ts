@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { sessionState } from "./session";
+import { createFinishLatch, sessionState } from "./session";
 
 const PERIOD = 6;
 const FADE = 2;
@@ -40,5 +40,22 @@ describe("sessionState", () => {
     expect(sessionState(PERIOD * 3 + FADE / 2, PERIOD, 3, FADE).brightness).toBeCloseTo(0.5);
     expect(sessionState(PERIOD * 3 + FADE, PERIOD, 3, FADE).brightness).toBe(0);
     expect(sessionState(PERIOD * 3 + FADE * 5, PERIOD, 3, FADE).brightness).toBe(0); // clamped
+  });
+});
+
+describe("createFinishLatch", () => {
+  it("fires once on completion, not every frame", () => {
+    const latch = createFinishLatch();
+    expect(latch.check(false)).toBe(false); // running
+    expect(latch.check(true)).toBe(true); // crossed into finished
+    expect(latch.check(true)).toBe(false); // still finished, already fired
+    expect(latch.check(true)).toBe(false);
+  });
+
+  it("re-arms after reset for the next session", () => {
+    const latch = createFinishLatch();
+    latch.check(true);
+    latch.reset();
+    expect(latch.check(true)).toBe(true);
   });
 });

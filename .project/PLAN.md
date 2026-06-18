@@ -36,3 +36,14 @@ concurrent rings (ring-count param in shader, fixed at 1); hyperspace/warp patte
 - [x] Color preset dropdown (Black/White default, Kutastha, low-contrast options)
 - [x] Session-end fade resolves to the chosen background color instead of black
 - [x] Deliberate start: idle on load, "Start session" begins/restarts a session without page reload
+
+### Audio layer (per D12 / blueprint)
+- [ ] Renderer emits a one-shot `onFinish` on session completion; re-arms on restart
+- [ ] Config persists `audioEnabled` (default off) and `volume`, validated with fallbacks
+- [ ] Overlay exposes audio enable toggle + volume; changes apply live and persist
+- [ ] First enabled start dynamically loads Tone + audio controller (base bundle unchanged when off)
+- [ ] Walking skeleton: one looped nature sample fades in on start, fades out mirroring session fade
+- [ ] Multi-stream nature bed: ocean/wind/birds/leaves, each HRTF-positioned, ≤1 slow drift
+- [ ] Headphones-recommended hint on the start screen
+- [ ] Generative melody layer under the streams (bounded scale, slow, no hooks)
+- [ ] Source CC0/royalty-free samples and bundle as static same-origin assets

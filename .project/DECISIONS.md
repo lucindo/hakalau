@@ -60,7 +60,7 @@ bound to a config object — too small to justify a framework. GitHub Pages fits
 ## D9 — Audio
 **Q:** Build audio seams now or defer?
 **A:** Defer audio entirely from v1 — no Web Audio code, no abstraction. Only keep the session
-lifecycle (start/stop/fade) clean as the future hook point.
+lifecycle (start/stop/fade) clean as the future hook point. (Superseded post-v1 by D12.)
 **Why:** Simplicity-first; don't build for an unimplemented feature. A clean session lifecycle
 (already needed for D5) is the natural attach point later, at zero extra cost now.
 
@@ -74,3 +74,22 @@ ring softness/thickness. Internal-only: ring count (=1), color (white on black).
 **Q:** Persist settings across reloads?
 **A:** Yes — persist config to localStorage, restore on load; defaults on first run.
 **Why:** Tiny to implement; once a feel is dialed in, re-entering it every visit is friction.
+
+## D12 — Audio layer (supersedes D9)
+**Q:** How to build the post-v1 audio layer — the auditory analog of Hakalau (distinct streams the
+listener's attention can float across)?
+**A:** A self-contained subsystem under `src/audio/`, wired in at `main.ts`, driven by two discrete
+lifecycle events from existing seams: *start* (the "Start session" gesture) and *finish* (renderer
+emits a one-shot `onFinish` when a finite session completes). Tone.js for the whole graph, one
+shared AudioContext, dynamically imported on first start-with-audio-enabled. Nature streams (ocean,
+wind, birds, leaves) = bundled CC0 samples via `Tone.Player`, each HRTF-positioned via
+`Tone.Panner3D` (mostly static, ≤1 slow drift); a bounded-scale generative melody runs underneath.
+Audio is **decoupled** from the ring rhythm. Fade-in on start; fade-out mirrors the visual
+`brightness` ramp (shared `FADE_SECONDS`). Config gains `audioEnabled` (default **off**) + master
+`volume`; one curated scene to start (soundscapes pluggable later, pattern-style).
+**Why:** Generative melody is the only layer that justifies Tone.js — samples/spatialization are
+equally trivial in raw Web Audio — but once Tone is paid for, one paradigm/context beats straddling
+raw + Tone. Renderer stays the single source of truth for "session end" (it already reads config
+live); audio is told *when*, never recomputes it, so live `rounds`/`cycle` edits can't drift the two
+apart. Default-off + dynamic import keep the base bundle untouched for users who never enable sound.
+Decoupled because synced swell becomes a beat the mind tracks — the opposite of soft awareness.
