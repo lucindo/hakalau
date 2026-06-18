@@ -102,10 +102,13 @@ export function createOverlay(config: Config, handlers: OverlayHandlers): HTMLEl
     clearTimeout(hideTimer);
     panel.classList.remove("overlay--visible");
   };
-  const show = () => {
-    panel.classList.add("overlay--visible");
+  const armHide = () => {
     clearTimeout(hideTimer);
     hideTimer = window.setTimeout(hide, AUTO_HIDE_MS);
+  };
+  const show = () => {
+    panel.classList.add("overlay--visible");
+    armHide();
   };
   closeBtn.addEventListener("click", hide);
   // Restart timing from zero and clear the chrome so practice resumes unobstructed.
@@ -118,7 +121,9 @@ export function createOverlay(config: Config, handlers: OverlayHandlers): HTMLEl
   panel.addEventListener("input", show); // keep panel alive while adjusting
   // Don't time out while the pointer rests on the panel (e.g. reading the options).
   panel.addEventListener("pointerenter", () => clearTimeout(hideTimer));
-  panel.addEventListener("pointerleave", show);
+  // Re-arm the countdown on leave, but don't re-reveal — otherwise closing the
+  // panel (Start/close) slides it out from under the pointer and pops it back.
+  panel.addEventListener("pointerleave", armHide);
 
   // Show controls on load and leave them pinned until the user starts a session.
   panel.classList.add("overlay--visible");
