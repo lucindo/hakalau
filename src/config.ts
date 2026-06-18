@@ -3,11 +3,11 @@ import * as v from "valibot";
 // dotSize and ringSoftness units: dot radius in CSS px; softness 0 (crisp) → 1 (soft).
 // fallback() yields per-field defaults when a value is missing or out of range.
 const ConfigSchema = v.object({
-  cycleSeconds: v.fallback(v.pipe(v.number(), v.minValue(0.5), v.maxValue(60)), 6),
+  cycleSeconds: v.fallback(v.pipe(v.number(), v.minValue(0.5), v.maxValue(60)), 25),
   rounds: v.fallback(v.pipe(v.number(), v.integer(), v.minValue(0)), 0),
   dotEnabled: v.fallback(v.boolean(), true),
-  dotSize: v.fallback(v.pipe(v.number(), v.minValue(1), v.maxValue(40)), 4),
-  ringSoftness: v.fallback(v.pipe(v.number(), v.minValue(0), v.maxValue(1)), 0.5),
+  dotSize: v.fallback(v.pipe(v.number(), v.minValue(1), v.maxValue(40)), 5),
+  ringSoftness: v.fallback(v.pipe(v.number(), v.minValue(0), v.maxValue(1)), 0.1),
 });
 
 export type Config = v.InferOutput<typeof ConfigSchema>;
