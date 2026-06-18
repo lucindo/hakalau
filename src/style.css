@@ -10,6 +10,12 @@ canvas {
   display: block;
 }
 
+/* A display rule (flex on .config/.pause/.countdown) outranks the UA [hidden]
+   rule, so the attribute is inert without this. */
+[hidden] {
+  display: none !important;
+}
+
 .stage {
   position: fixed;
   inset: 0;
