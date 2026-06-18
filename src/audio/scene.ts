@@ -1,6 +1,7 @@
 import * as Tone from "tone";
 
 const BASE = import.meta.env.BASE_URL;
+const NATURE_GAIN = 0.4; // bed level, kept below the melody so it doesn't swamp it
 
 interface StreamDef {
   url: string;
@@ -23,16 +24,17 @@ export interface Scene {
 }
 
 export function createScene(destination: Tone.InputNode): Scene {
+  const bus = new Tone.Gain(NATURE_GAIN).connect(destination);
   const players = STREAMS.map((s) => {
     const player = new Tone.Player({ url: s.url, loop: true });
     if (!s.position) {
-      player.connect(destination);
+      player.connect(bus);
       return player;
     }
     const [x, y, z] = s.position;
     const panner = new Tone.Panner3D({ panningModel: "HRTF", rolloffFactor: 0 });
     panner.setPosition(x, y, z);
-    player.chain(panner, destination);
+    player.chain(panner, bus);
     if (s.drift) {
       const lfo = new Tone.LFO({ frequency: 0.03, min: x - s.drift, max: x + s.drift });
       lfo.connect(panner.positionX);

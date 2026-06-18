@@ -45,5 +45,5 @@ concurrent rings (ring-count param in shader, fixed at 1); hyperspace/warp patte
 - [x] Walking skeleton: one looped nature sample fades in on start, fades out mirroring session fade
 - [x] Multi-stream nature bed: ocean (wide floor) + HRTF birds (drifting) + wind; leaves deferred (no clean CC0 isolate)
 - [~] Headphones-recommended hint on the start screen — dropped (not wanted)
-- [ ] Generative melody layer under the streams (bounded scale, slow, no hooks)
-- [ ] Source CC0/royalty-free samples and bundle as static same-origin assets
+- [x] Generative melody layer under the streams (bounded scale, slow, no hooks)
+- [x] Source CC0/royalty-free samples and bundle as static same-origin assets (ocean CC0, birds/wind PD; leaves pending)

@@ -18,7 +18,7 @@ export function createMelody(destination: Tone.InputNode): Melody {
   const synth = new Tone.PolySynth(Tone.Synth, {
     oscillator: { type: "sine" },
     envelope: { attack: 3, decay: 2, sustain: 0.4, release: 6 },
-    volume: -18,
+    volume: -12,
   }).connect(reverb);
 
   const loop = new Tone.Loop((time) => {
