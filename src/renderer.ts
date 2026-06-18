@@ -1,6 +1,6 @@
 import type { Config } from "./config";
 import { createProgram } from "./gl";
-import { sessionState } from "./session";
+import { FADE_SECONDS, sessionState } from "./session";
 import vertSrc from "./shaders/fullscreen.vert?raw";
 import fragSrc from "./shaders/expanding-ring.frag?raw";
 
@@ -19,6 +19,7 @@ export function startRenderer(canvas: HTMLCanvasElement, config: Config): boolea
   const uDotEnabled = gl.getUniformLocation(program, "u_dotEnabled");
   const uRingSoftness = gl.getUniformLocation(program, "u_ringSoftness");
   const uRingEnabled = gl.getUniformLocation(program, "u_ringEnabled");
+  const uBrightness = gl.getUniformLocation(program, "u_brightness");
   gl.clearColor(0, 0, 0, 1);
 
   let dpr = 1;
@@ -40,7 +41,7 @@ export function startRenderer(canvas: HTMLCanvasElement, config: Config): boolea
   const frame = (now: number) => {
     if (start === null) start = now;
     const elapsed = (now - start) / 1000;
-    const session = sessionState(elapsed, config.cycleSeconds, config.rounds);
+    const session = sessionState(elapsed, config.cycleSeconds, config.rounds, FADE_SECONDS);
     gl.uniform2f(uResolution, canvas.width, canvas.height);
     gl.uniform1f(uTime, elapsed);
     gl.uniform1f(uPeriod, config.cycleSeconds);
@@ -48,6 +49,7 @@ export function startRenderer(canvas: HTMLCanvasElement, config: Config): boolea
     gl.uniform1f(uDotEnabled, config.dotEnabled ? 1 : 0);
     gl.uniform1f(uRingSoftness, config.ringSoftness);
     gl.uniform1f(uRingEnabled, session.ringActive ? 1 : 0);
+    gl.uniform1f(uBrightness, session.brightness);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     requestAnimationFrame(frame);
