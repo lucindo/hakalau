@@ -24,7 +24,7 @@ export function createMelody(destination: Tone.InputNode): Melody {
   const loop = new Tone.Loop((time) => {
     const note = SCALE[Math.floor(Math.random() * SCALE.length)];
     if (!note || Math.random() > NOTE_CHANCE) return;
-    synth.triggerAttackRelease(note, "2n", time, 0.25 + Math.random() * 0.2);
+    synth.triggerAttackRelease(note, "2n", time, 0.55 + Math.random() * 0.25);
   }, "2n");
 
   const transport = Tone.getTransport();

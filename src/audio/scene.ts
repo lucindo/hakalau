@@ -1,7 +1,7 @@
 import * as Tone from "tone";
 
 const BASE = import.meta.env.BASE_URL;
-const NATURE_GAIN = 0.4; // bed level, kept below the melody so it doesn't swamp it
+const NATURE_GAIN = 0.22; // bed level, kept below the melody so it doesn't swamp it
 
 interface StreamDef {
   url: string;
