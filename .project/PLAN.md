@@ -41,8 +41,8 @@ concurrent rings (ring-count param in shader, fixed at 1); hyperspace/warp patte
 - [x] Renderer emits a one-shot `onFinish` on session completion; re-arms on restart
 - [x] Config persists `audioEnabled` (default off) and `volume`, validated with fallbacks
 - [x] Overlay exposes audio enable toggle + volume; persist (live push lands with controller)
-- [ ] First enabled start dynamically loads Tone + audio controller (base bundle unchanged when off)
-- [ ] Walking skeleton: one looped nature sample fades in on start, fades out mirroring session fade
+- [x] First enabled start dynamically loads Tone + audio controller (base bundle unchanged when off)
+- [x] Walking skeleton: one looped nature sample fades in on start, fades out mirroring session fade
 - [ ] Multi-stream nature bed: ocean/wind/birds/leaves, each HRTF-positioned, ≤1 slow drift
 - [ ] Headphones-recommended hint on the start screen
 - [ ] Generative melody layer under the streams (bounded scale, slow, no hooks)

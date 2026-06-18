@@ -13,7 +13,7 @@ const ConfigSchema = v.object({
   bgColor: v.fallback(hexColor, "#000000"),
   fgColor: v.fallback(hexColor, "#ffffff"),
   audioEnabled: v.fallback(v.boolean(), false),
-  volume: v.fallback(v.pipe(v.number(), v.minValue(0), v.maxValue(1)), 0.7),
+  volume: v.fallback(v.pipe(v.number(), v.minValue(0), v.maxValue(1)), 0.5),
 });
 
 export type Config = v.InferOutput<typeof ConfigSchema>;
