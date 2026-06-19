@@ -1,23 +1,21 @@
 # Plan — Hakalau Meditation Canvas
 
 ## Now
-**State:** Session-flow rework merged to `main` (PR #2, `c2a1dba`); branch deleted. Visuals audited
-by user — all OK. The app: explicit screen state machine in `src/app.ts` (config + boxed live preview
-→ 3·2·1 countdown → running → click-to-pause Continue/Stop → fade → config); renderer `pause/resume/
-stop` + `onFadeComplete`; `src/preview.ts` second WebGL2 context; GL/DPR/phase shared via `src/glHost.ts`;
-CSS crossfades via `.screen`, shared `.card` + `--brand` tokens; audio `arm()` resumes the context on
-the Start gesture. v1 roadmap complete. 16 tests green, build clean, base bundle 6.53 KB gz, deployed.
+**State:** Audio bed polish merged to `main` (PR #3, `b4d61ff`); branch deleted, deploy green.
+Added the **leaves** stream (aspen/cottonwood, PD Mark, −26 LUFS, spatialized [3,-1,2] drift 3) and made
+all four bed loops seamless. Runtime stays the proven `loop:true` players in `src/audio/scene.ts`; the
+seam fix is baked into the assets offline — a 3 s tail→head `acrossfade` per file (→42 s). Verified
+offline: loop join no longer dips to silence (ocean −61→−23 dB, wind −75→−42 dB). Not yet auditioned
+live. Prior session-flow rework also merged (PR #2). v1 roadmap complete. 16 tests green, build clean,
+base bundle 6.53 KB gz, deployed.
 
-**Audio polish (branch `audio-polish`, 1 commit `6d0832d`, not pushed):** added the **leaves** stream
-(aspen/cottonwood, PD Mark, −26 LUFS, spatialized [3,-1,2] drift 3) and made all four bed loops seamless.
-Runtime stays the proven `loop:true` players in `src/audio/scene.ts`; the seam fix is baked into the
-assets offline — a 3 s tail→head `acrossfade` per file (→42 s), so the wrap is continuous. (Two runtime
-crossfade attempts — standalone Tone.Clock, then a lookahead scheduler — both failed in ways unverifiable
-without a browser; moved the crossfade offline where it's measurable.) Verified offline: loop join no
-longer dips to silence (ocean −61→−23 dB, wind −75→−42 dB at the join). Mix-by-ear closed as good-enough.
-Build clean, base bundle 6.53 KB gz unchanged, 16 tests green.
+Earlier app work: screen state machine in `src/app.ts` (config + boxed live preview → 3·2·1 countdown
+→ running → click-to-pause → fade → config); renderer `pause/resume/stop` + `onFadeComplete`;
+`src/preview.ts` second WebGL2 context; GL/DPR/phase shared via `src/glHost.ts`; audio `arm()` resumes
+the context on the Start gesture.
 
-**Next:** quick listen to confirm the bed plays + loops cleanly, then push + PR to `main`.
+**Next:** discussing spatial/3D sound design (current bed uses Panner3D HRTF with fixed positions +
+slow drift LFOs). Open question on the table — where to take the 3D field next.
 
 **Open questions / deferred:** preview dot/ring render bold (absolute device-px) — faithful scaling
 needs a shader change. Carried over post-v1: concurrent rings; hyperspace/warp pattern.
