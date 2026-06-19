@@ -9,13 +9,14 @@ interface StreamDef {
   drift?: number; // peak ± X sweep (meters) for a slow side-to-side drift
 }
 
-// Listener sits at the origin facing -Z. Ocean is the wide floor; birds and wind
-// are placed so attention can move between them. rolloffFactor 0 keeps levels
+// Listener sits at the origin facing -Z. Ocean is the wide floor; birds, wind and
+// leaves are placed so attention can move between them. rolloffFactor 0 keeps levels
 // steady — position gives direction (HRTF), not distance attenuation.
 const STREAMS: readonly StreamDef[] = [
   { url: `${BASE}audio/ocean.mp3` },
   { url: `${BASE}audio/birds.mp3`, position: [4, 2, -2], drift: 4 },
   { url: `${BASE}audio/wind.mp3`, position: [-5, 0, 1] },
+  { url: `${BASE}audio/leaves.mp3`, position: [3, -1, 2], drift: 3 },
 ];
 
 export interface Scene {
@@ -23,6 +24,8 @@ export interface Scene {
   restart: () => void;
 }
 
+// loop: true is gapless at the sample level; the assets are pre-crossfaded at their
+// loop point (offline, see public/audio/CREDITS.md) so the wrap is seamless too.
 export function createScene(destination: Tone.InputNode): Scene {
   const bus = new Tone.Gain(NATURE_GAIN).connect(destination);
   const players = STREAMS.map((s) => {
