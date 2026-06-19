@@ -14,8 +14,15 @@ Earlier app work: screen state machine in `src/app.ts` (config + boxed live prev
 `src/preview.ts` second WebGL2 context; GL/DPR/phase shared via `src/glHost.ts`; audio `arm()` resumes
 the context on the Start gesture.
 
-**Next:** discussing spatial/3D sound design (current bed uses Panner3D HRTF with fixed positions +
-slow drift LFOs). Open question on the table — where to take the 3D field next.
+**Spatial 3D bed — attempted and abandoned.** Built a roaming HRTF field (pure spherical random-walk
+`walk.ts` + per-source Panner3D with distance cues) on branch `spatial-bed` (kept, unpushed, not merged).
+Outcome: it sounded *worse* — thinner, not richer. Panner3D renders each input as a mono point, so
+spatializing the stereo field recordings collapses their width; the moving point sources lost the rich
+enveloping image the plain stereo bed already had. Distance attenuation made far sources nearly vanish.
+Net: the 3D approach via per-source HRTF is the wrong tool for these stereo ambiences. Not pursuing
+further unless revisited with a different technique (e.g. ambisonics / decorrelated multi-point beds).
+
+**Next:** none committed. Bed on `main` is the keeper. Deferred items below stand.
 
 **Open questions / deferred:** preview dot/ring render bold (absolute device-px) — faithful scaling
 needs a shader change. Carried over post-v1: concurrent rings; hyperspace/warp pattern.
