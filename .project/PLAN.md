@@ -1,21 +1,26 @@
 # Plan — Hakalau Meditation Canvas
 
 ## Now
-**State:** Session-flow rework done on branch `session-flow` (8 commits, not yet pushed). Replaced
-the auto-hiding side panel with an explicit screen state machine in `src/app.ts`: config (settings +
-boxed live preview) → 3·2·1 countdown → running → click-to-pause (Continue/Stop) → fade → back to
-config. Renderer gained `pause/resume/stop` + `onFadeComplete`; `src/preview.ts` runs a second WebGL2
-context for the live preview; GL bootstrap/DPR/phase deduped into `src/glHost.ts`; CSS crossfades via
-`.screen`, shared `.card` + `--brand` tokens. Audio gained `arm()` to resume the context on the Start
-gesture (session start is 3s later, past the gesture window). Code-review (risk: low) + deslop passes
-done. 16 tests green, build clean, base bundle 6.53 KB gz.
+**State:** Session-flow rework merged to `main` (PR #2, `c2a1dba`); branch deleted. Visuals audited
+by user — all OK. The app: explicit screen state machine in `src/app.ts` (config + boxed live preview
+→ 3·2·1 countdown → running → click-to-pause Continue/Stop → fade → config); renderer `pause/resume/
+stop` + `onFadeComplete`; `src/preview.ts` second WebGL2 context; GL/DPR/phase shared via `src/glHost.ts`;
+CSS crossfades via `.screen`, shared `.card` + `--brand` tokens; audio `arm()` resumes the context on
+the Start gesture. v1 roadmap complete. 16 tests green, build clean, base bundle 6.53 KB gz, deployed.
 
-**Next:** push `session-flow` and open a PR to `main` (CI deploys to Pages on merge).
+**Audio polish (branch `audio-polish`, 1 commit `6d0832d`, not pushed):** added the **leaves** stream
+(aspen/cottonwood, PD Mark, −26 LUFS, spatialized [3,-1,2] drift 3) and made all four bed loops seamless.
+Runtime stays the proven `loop:true` players in `src/audio/scene.ts`; the seam fix is baked into the
+assets offline — a 3 s tail→head `acrossfade` per file (→42 s), so the wrap is continuous. (Two runtime
+crossfade attempts — standalone Tone.Clock, then a lookahead scheduler — both failed in ways unverifiable
+without a browser; moved the crossfade offline where it's measurable.) Verified offline: loop join no
+longer dips to silence (ocean −61→−23 dB, wind −75→−42 dB at the join). Mix-by-ear closed as good-enough.
+Build clean, base bundle 6.53 KB gz unchanged, 16 tests green.
 
-**Open questions / deferred:** preview dot/ring render bold (absolute device-px) — left as-is, faithful
-scaling needs a shader change; final visual pass on countdown/pause feel pending user. Carried over:
-mix levels by-ear; loop seams not crossfade-seamless; **leaves** stream deferred; concurrent rings and
-hyperspace/warp pattern still untouched post-v1.
+**Next:** quick listen to confirm the bed plays + loops cleanly, then push + PR to `main`.
+
+**Open questions / deferred:** preview dot/ring render bold (absolute device-px) — faithful scaling
+needs a shader change. Carried over post-v1: concurrent rings; hyperspace/warp pattern.
 
 ## Roadmap
 
@@ -47,10 +52,11 @@ hyperspace/warp pattern still untouched post-v1.
 - [x] Overlay exposes audio enable toggle + volume; persist (live push lands with controller)
 - [x] First enabled start dynamically loads Tone + audio controller (base bundle unchanged when off)
 - [x] Walking skeleton: one looped nature sample fades in on start, fades out mirroring session fade
-- [x] Multi-stream nature bed: ocean (wide floor) + HRTF birds (drifting) + wind; leaves deferred (no clean CC0 isolate)
+- [x] Multi-stream nature bed: ocean (wide floor) + HRTF birds (drifting) + wind + leaves (aspen, drifting)
+- [x] Seamless loops: baked tail→head crossfade in each asset replaces the loop:true silence dip
 - [~] Headphones-recommended hint on the start screen — dropped (not wanted)
 - [x] Generative melody layer under the streams (bounded scale, slow, no hooks)
-- [x] Source CC0/royalty-free samples and bundle as static same-origin assets (ocean CC0, birds/wind PD; leaves pending)
+- [x] Source CC0/royalty-free samples and bundle as static same-origin assets (ocean CC0; birds/wind/leaves PD Mark)
 
 ### Session flow rework (branch `session-flow`)
 - [x] Renderer lifecycle: `pause`/`resume`/`stop` (early fade) + `onFadeComplete`; idle frame = dot only
@@ -60,4 +66,4 @@ hyperspace/warp pattern still untouched post-v1.
 - [x] Boxed live preview (`src/preview.ts`, second WebGL2 context) beside the controls
 - [x] Audio `arm()` resumes the context on the Start gesture, before the post-countdown `start()`
 - [x] Crossfades between screens (`.screen`); single-source `glHost.ts`, `.card`/`--brand` tokens
-- [ ] Push branch + open PR to `main`
+- [x] Push branch + open PR to `main` (merged via PR #2)
