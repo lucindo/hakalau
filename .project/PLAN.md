@@ -1,28 +1,17 @@
 # Plan — Hakalau Meditation Canvas
 
 ## Now
-**State:** Audio bed polish merged to `main` (PR #3, `b4d61ff`); branch deleted, deploy green.
-Added the **leaves** stream (aspen/cottonwood, PD Mark, −26 LUFS, spatialized [3,-1,2] drift 3) and made
-all four bed loops seamless. Runtime stays the proven `loop:true` players in `src/audio/scene.ts`; the
-seam fix is baked into the assets offline — a 3 s tail→head `acrossfade` per file (→42 s). Verified
-offline: loop join no longer dips to silence (ocean −61→−23 dB, wind −75→−42 dB). Not yet auditioned
-live. Prior session-flow rework also merged (PR #2). v1 roadmap complete. 16 tests green, build clean,
-base bundle 6.53 KB gz, deployed.
+**State:** On `main`, clean tree (2 unpushed docs-only commits). Everything merged & deployed: v1,
+session-flow rework (PR #2), audio bed polish (PR #3 — leaves stream + seamless `loop:true` loops via
+offline tail→head `acrossfade`). The current bed (stereo ocean floor + birds/wind/leaves + central
+generative melody) is the **keeper**. Spatial 3D bed was attempted on branch `spatial-bed` (unpushed,
+not merged) and **abandoned**: per-source Panner3D collapses the stereo ambiences to mono points →
+thinner, not richer. Wrong tool for stereo beds; would need ambisonics/decorrelation to revisit.
 
-Earlier app work: screen state machine in `src/app.ts` (config + boxed live preview → 3·2·1 countdown
-→ running → click-to-pause → fade → config); renderer `pause/resume/stop` + `onFadeComplete`;
-`src/preview.ts` second WebGL2 context; GL/DPR/phase shared via `src/glHost.ts`; audio `arm()` resumes
-the context on the Start gesture.
+**Next:** none committed — pick a deferred item, or push the two local docs commits.
 
-**Spatial 3D bed — attempted and abandoned.** Built a roaming HRTF field (pure spherical random-walk
-`walk.ts` + per-source Panner3D with distance cues) on branch `spatial-bed` (kept, unpushed, not merged).
-Outcome: it sounded *worse* — thinner, not richer. Panner3D renders each input as a mono point, so
-spatializing the stereo field recordings collapses their width; the moving point sources lost the rich
-enveloping image the plain stereo bed already had. Distance attenuation made far sources nearly vanish.
-Net: the 3D approach via per-source HRTF is the wrong tool for these stereo ambiences. Not pursuing
-further unless revisited with a different technique (e.g. ambisonics / decorrelated multi-point beds).
-
-**Next:** none committed. Bed on `main` is the keeper. Deferred items below stand.
+**Open questions:** keep or delete the `spatial-bed` branch? Deferred (post-v1): preview dot/ring render
+bold (needs a shader change); concurrent rings; hyperspace/warp pattern.
 
 **Open questions / deferred:** preview dot/ring render bold (absolute device-px) — faithful scaling
 needs a shader change. Carried over post-v1: concurrent rings; hyperspace/warp pattern.
@@ -62,6 +51,7 @@ needs a shader change. Carried over post-v1: concurrent rings; hyperspace/warp p
 - [~] Headphones-recommended hint on the start screen — dropped (not wanted)
 - [x] Generative melody layer under the streams (bounded scale, slow, no hooks)
 - [x] Source CC0/royalty-free samples and bundle as static same-origin assets (ocean CC0; birds/wind/leaves PD Mark)
+- [~] Spatial 3D roaming bed (per-source HRTF) — built on `spatial-bed`, abandoned: collapses stereo width, sounds thinner
 
 ### Session flow rework (branch `session-flow`)
 - [x] Renderer lifecycle: `pause`/`resume`/`stop` (early fade) + `onFadeComplete`; idle frame = dot only
