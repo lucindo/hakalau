@@ -71,3 +71,4 @@ needs a shader change. Carried over post-v1: concurrent rings; hyperspace/warp p
 - [x] Overlay replaces the audio toggle with a soundscape dropdown; selection persists, sound plays only during a session (audition on the config screen was tried and dropped)
 - [x] Tests cover soundscape validation and the boolean→choice migration
 - [x] Verify by ear (`bun run dev`): bell strikes clean once per round and chains seamlessly at 25 s cycles — confirmed by owner
+- [x] Fix (PR #5): bell retriggers via `player.start()` (Tone `restart()` no-ops on a stopped one-shot → bell died after first play); bed switch hard-zeroes the outgoing bus (ramp leaked a ~1 s garden tail once master came up) — verified by owner

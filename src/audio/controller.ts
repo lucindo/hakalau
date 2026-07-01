@@ -6,7 +6,6 @@ import { createBellScene, createGardenScene } from "./scene";
 
 const FADE_IN_SECONDS = 2;
 const CONTROL_RAMP = 0.1; // smooth a live volume/mute change without a click
-const BED_SWAP_SECONDS = 1; // outgoing bed fades under the incoming one on a live switch
 
 type BedName = Exclude<Soundscape, "off">;
 
@@ -61,25 +60,25 @@ export function createAudioController(): AudioController {
       muted = false;
       await Tone.start(); // idempotent; context already resumed by arm()
       await Tone.loaded(); // decode the buffers before playing
+      // Master is silent between sessions, so switching beds is a hard route
+      // change — bus gains are on/off switches; only the master envelope fades.
+      // A ramp here would leak the old bed once the master comes up.
       if (current !== null && current !== config.soundscape) {
-        bedFor(current).bus.gain.rampTo(0, BED_SWAP_SECONDS);
+        bedFor(current).bus.gain.value = 0;
       }
       current = config.soundscape;
-      // Gains land before the players emit so an instant entry isn't clipped.
-      bed.bus.gain.cancelScheduledValues(Tone.now());
-      master.gain.cancelScheduledValues(Tone.now());
-      if (bed.fadeIn === 0) {
-        bed.bus.gain.value = 1;
-        master.gain.value = audible();
-      } else {
-        bed.bus.gain.rampTo(1, BED_SWAP_SECONDS);
-        master.gain.rampTo(audible(), bed.fadeIn);
-      }
+      bed.bus.gain.value = 1;
       if (bed.started) {
         for (const p of bed.parts) p.restart();
       } else {
         for (const p of bed.parts) p.start();
         bed.started = true;
+      }
+      master.gain.cancelScheduledValues(Tone.now());
+      if (bed.fadeIn === 0) {
+        master.gain.value = audible();
+      } else {
+        master.gain.rampTo(audible(), bed.fadeIn);
       }
     },
     cycle() {

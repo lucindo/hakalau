@@ -59,8 +59,10 @@ export function createGardenScene(destination: Tone.InputNode): Scene {
 // strikes chain like the original loop.
 export function createBellScene(destination: Tone.InputNode): Scene {
   const player = new Tone.Player({ url: `${BASE}audio/bell.wav` }).connect(destination);
+  // Both map to start(): Tone restarts a playing source and revives a stopped
+  // one, while restart() silently no-ops once a one-shot player ends.
   return {
     start: () => player.start(),
-    restart: () => player.restart(),
+    restart: () => player.start(),
   };
 }
