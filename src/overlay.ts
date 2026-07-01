@@ -1,4 +1,4 @@
-import { type Config, type Soundscape, saveConfig } from "./config";
+import { CONFIG_BOUNDS, type Config, SOUNDSCAPES, type Soundscape, saveConfig } from "./config";
 import { COLOR_PRESETS } from "./presets";
 
 // Config panel for the home screen. The app state machine owns its visibility;
@@ -20,7 +20,8 @@ export function createConfigPanel(config: Config, handlers: OverlayHandlers): HT
   startBtn.textContent = "Start session";
   panel.appendChild(startBtn);
 
-  addRange(panel, "Cycle (s)", 0.5, 60, 0.5, config.cycleSeconds, (v) => {
+  const bounds = CONFIG_BOUNDS;
+  addRange(panel, "Cycle (s)", bounds.cycleSeconds.min, bounds.cycleSeconds.max, 0.5, config.cycleSeconds, (v) => {
     config.cycleSeconds = v;
     saveConfig(config);
   });
@@ -32,11 +33,11 @@ export function createConfigPanel(config: Config, handlers: OverlayHandlers): HT
     config.dotEnabled = v;
     saveConfig(config);
   });
-  addRange(panel, "Dot size", 1, 40, 1, config.dotSize, (v) => {
+  addRange(panel, "Dot size", bounds.dotSize.min, bounds.dotSize.max, 1, config.dotSize, (v) => {
     config.dotSize = v;
     saveConfig(config);
   });
-  addRange(panel, "Ring softness", 0, 1, 0.01, config.ringSoftness, (v) => {
+  addRange(panel, "Ring softness", bounds.ringSoftness.min, bounds.ringSoftness.max, 0.01, config.ringSoftness, (v) => {
     config.ringSoftness = v;
     saveConfig(config);
   });
@@ -74,16 +75,14 @@ export function createConfigPanel(config: Config, handlers: OverlayHandlers): HT
     saveConfig(config);
   });
 
-  const soundscapeOptions = [
-    { value: "off", label: "Off" },
-    { value: "garden", label: "Garden" },
-    { value: "bell", label: "Bell" },
-  ];
+  // Labels keyed by Soundscape, so adding one in config.ts forces a label here.
+  const soundscapeLabels: Record<Soundscape, string> = { off: "Off", garden: "Garden", bell: "Bell" };
+  const soundscapeOptions = SOUNDSCAPES.map((s) => ({ value: s, label: soundscapeLabels[s] }));
   addSelect(panel, "Sound", soundscapeOptions, config.soundscape, (val) => {
-    config.soundscape = val as Soundscape; // options above are exactly the Soundscape values
+    config.soundscape = val;
     saveConfig(config);
   });
-  addRange(panel, "Volume", 0, 1, 0.01, config.volume, (v) => {
+  addRange(panel, "Volume", bounds.volume.min, bounds.volume.max, 0.01, config.volume, (v) => {
     config.volume = v;
     saveConfig(config);
     handlers.onVolumeChange();
@@ -142,6 +141,9 @@ function addNumber(
   input.step = "1";
   input.value = String(value);
   input.addEventListener("input", () => {
+    // Mid-edit clear reads as "" (Number("") === 0) — keep the last valid value
+    // rather than silently persisting 0 (= endless).
+    if (input.value === "") return;
     const v = Math.floor(Number(input.value));
     if (Number.isFinite(v) && v >= 0) onChange(v);
   });
@@ -175,12 +177,12 @@ function addColor(
   return input;
 }
 
-function addSelect(
+function addSelect<T extends string>(
   parent: HTMLElement,
   label: string,
-  options: ReadonlyArray<{ value: string; label: string }>,
-  value: string,
-  onChange: (v: string) => void,
+  options: ReadonlyArray<{ value: T; label: string }>,
+  value: T,
+  onChange: (v: T) => void,
 ): HTMLSelectElement {
   const select = document.createElement("select");
   for (const opt of options) {
@@ -190,7 +192,8 @@ function addSelect(
     select.appendChild(o);
   }
   select.value = value;
-  select.addEventListener("change", () => onChange(select.value));
+  // The DOM widens to string, but the options above are the value's only source.
+  select.addEventListener("change", () => onChange(select.value as T));
   addRow(parent, label, select);
   return select;
 }
