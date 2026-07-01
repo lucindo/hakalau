@@ -114,3 +114,21 @@ keeps `Tone.loaded()` as the slow-network safety net.
 **Why:** Owner's call — the preload must cover a first-time visitor (default off → picks Bell →
 Start), so it can't wait for a persisted choice; the wasted ~6.8MB for visitors who never enable
 sound is accepted. Supersedes D12's "sound-off users download nothing" property.
+
+## D15 — Audio failure policy: retry the import, degrade silent on samples
+**Q:** A failed Tone-chunk import stuck forever (cached rejected promise) and a failed sample
+download rejected `Tone.loaded()` uncaught — sticky-dead audio plus unhandled rejections. More
+reachable since D14 moved all downloads to page load. What's the recovery policy?
+**A:** Import failure clears the cached promise so the next Start retries; `arm()`/`start()`
+failures log one warning and the session runs silent. Deliberately no retry for failed samples.
+**Why:** Retrying samples would rebuild the audio graph, re-download ~6.8MB, and orphan the old
+Tone nodes (still wired to the destination) — disproportionate for a calm meditation app where
+running silent is an acceptable degraded mode. The import retry is free and side-effect-less.
+
+## D16 — Renderer/preview canvas sizing stays duplicated (won't-fix)
+**Q:** `renderer.ts` and `preview.ts` duplicate DPR-aware canvas sizing (flagged by the quality
+and SSOT reviews). Unify behind a shared `fit()` on the pattern host?
+**A:** No — keep both as they are.
+**Why:** Unifying forces real semantic changes (window→element sizing, resize-event→per-frame
+reads) on an eye-verified renderer; ~10 saved lines don't cover the regression risk. Revisit only
+if a third GL surface appears.

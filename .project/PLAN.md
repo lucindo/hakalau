@@ -1,12 +1,12 @@
 # Plan — Hakalau Meditation Canvas
 
 ## Now
-**State:** On `main`, clean and fully pushed; deploy live. Audio preload shipped (PR #6, verified
-by owner): `warm()` builds both beds at page load so all samples (bell 4.2MB + garden 2.6MB)
-fetch+decode before Start — every visitor pays the download, even with sound off (D14, amends
-D12). Tone stays an async chunk; first paint and base bundle unchanged. Bell asset is the owner's
-WAV byte-identical — never re-encode or process it. Spatial 3D bed remains abandoned on local
-`spatial-bed` (Panner3D collapses stereo beds; would need ambisonics to revisit).
+**State:** On `main`, clean and fully pushed at **v1.0.0**; deploy live. Full-codebase quality pass
+merged (PR #7): every finding from the deslop/quality/SSOT/bug/TS review sweeps applied or closed.
+Audio failure policy in place (D15: import retries, sample failures degrade silent). Note: D14's
+`warm()` was folded away — preload now happens inside `createAudioController()`; same behavior.
+Bell asset is the owner's WAV byte-identical — never re-encode or process it. Spatial 3D bed
+remains abandoned on local `spatial-bed` (Panner3D collapses stereo beds).
 
 **Next:** none committed — pick a deferred item.
 
@@ -75,3 +75,10 @@ via `player.start()`.
 - [x] Verify by ear (`bun run dev`): bell strikes clean once per round and chains seamlessly at 25 s cycles — confirmed by owner
 - [x] Fix (PR #5): bell retriggers via `player.start()` (Tone `restart()` no-ops on a stopped one-shot → bell died after first play); bed switch hard-zeroes the outgoing bus (ramp leaked a ~1 s garden tail once master came up) — verified by owner
 - [x] Preload (PR #6): `warm()` builds both beds at page load — all samples fetch+decode up front so Start never waits on the network (D14); selection-time warm removed — verified by owner
+
+### Quality pass — v1.0.0 (PR #7)
+- [x] Review sweeps (deslop, code-quality, SSOT, bug, TS) over the full codebase; all findings applied or closed
+- [x] SSOT: `CONFIG_BOUNDS` feeds schema + sliders; soundscape dropdown derives from `SOUNDSCAPES` with exhaustive labels; `addSelect` generic
+- [x] Fixes: audio failure recovery (D15), countdown keyboard re-entry guard, cleared rounds field no longer persists 0
+- [x] Cleanups: `warm()` folded into controller construction; one fade curve (`fadeBrightness`); fade/finish share the latch idiom
+- [~] Canvas-sizing dedup (renderer vs preview) — closed won't-fix (D16)
