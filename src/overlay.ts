@@ -79,7 +79,7 @@ export function createConfigPanel(config: Config, handlers: OverlayHandlers): HT
   const soundscapeLabels: Record<Soundscape, string> = { off: "Off", garden: "Garden", bell: "Bell" };
   const soundscapeOptions = SOUNDSCAPES.map((s) => ({ value: s, label: soundscapeLabels[s] }));
   addSelect(panel, "Sound", soundscapeOptions, config.soundscape, (val) => {
-    config.soundscape = val as Soundscape; // options are exactly SOUNDSCAPES
+    config.soundscape = val;
     saveConfig(config);
   });
   addRange(panel, "Volume", bounds.volume.min, bounds.volume.max, 0.01, config.volume, (v) => {
@@ -174,12 +174,12 @@ function addColor(
   return input;
 }
 
-function addSelect(
+function addSelect<T extends string>(
   parent: HTMLElement,
   label: string,
-  options: ReadonlyArray<{ value: string; label: string }>,
-  value: string,
-  onChange: (v: string) => void,
+  options: ReadonlyArray<{ value: T; label: string }>,
+  value: T,
+  onChange: (v: T) => void,
 ): HTMLSelectElement {
   const select = document.createElement("select");
   for (const opt of options) {
@@ -189,7 +189,8 @@ function addSelect(
     select.appendChild(o);
   }
   select.value = value;
-  select.addEventListener("change", () => onChange(select.value));
+  // The DOM widens to string, but the options above are the value's only source.
+  select.addEventListener("change", () => onChange(select.value as T));
   addRow(parent, label, select);
   return select;
 }
