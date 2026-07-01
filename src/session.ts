@@ -5,7 +5,7 @@ export interface SessionState {
   brightness: number; // global fade-out multiplier, 1 → 0 after finishing
 }
 
-// Fade-out duration after the last round (OQ-3 default).
+// Fade-out duration after the last round.
 export const FADE_SECONDS = 2;
 
 // One round = one ring cycle. rounds === 0 runs endlessly.
