@@ -29,8 +29,8 @@ export function fadeBrightness(sinceFadeStartSeconds: number, fadeSeconds: numbe
   return Math.max(0, 1 - sinceFadeStartSeconds / fadeSeconds);
 }
 
-// One-shot latch on session completion: check() returns true only on the first
-// frame finished goes true, so the host can trigger end effects (audio fade)
+// One-shot latch: check() returns true only on the first frame its condition
+// goes true, so the host fires end-of-session effects (finish, fade complete)
 // once instead of every frame. reset() re-arms it for the next session.
 export function createFinishLatch(): { check: (finished: boolean) => boolean; reset: () => void } {
   let fired = false;

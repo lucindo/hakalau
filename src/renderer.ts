@@ -62,7 +62,7 @@ export function startRenderer(
   let ringPhase = 0;
   let lastCycles = 0;
   const finishLatch = createFinishLatch();
-  let fadeDone = false; // one-shot guard for onFadeComplete
+  const fadeLatch = createFinishLatch(); // one-shot for onFadeComplete
 
   const frame = (now: number) => {
     const advancing = mode === "running" || mode === "stopping";
@@ -87,8 +87,7 @@ export function startRenderer(
     }
 
     // When an ending session reaches full background, fire once and go idle.
-    if (advancing && session.finished && session.brightness <= 0 && !fadeDone) {
-      fadeDone = true;
+    if (fadeLatch.check(advancing && session.finished && session.brightness <= 0)) {
       mode = "idle";
       onFadeComplete?.();
     }
@@ -105,7 +104,7 @@ export function startRenderer(
       ringPhase = 0;
       lastCycles = 0;
       stopElapsed = 0;
-      fadeDone = false;
+      fadeLatch.reset();
       finishLatch.reset();
     },
     pause: () => {
