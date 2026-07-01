@@ -26,7 +26,7 @@ export interface Scene {
 
 // loop: true is gapless at the sample level; the assets are pre-crossfaded at their
 // loop point (offline, see public/audio/CREDITS.md) so the wrap is seamless too.
-export function createScene(destination: Tone.InputNode): Scene {
+export function createGardenScene(destination: Tone.InputNode): Scene {
   const bus = new Tone.Gain(NATURE_GAIN).connect(destination);
   const players = STREAMS.map((s) => {
     const player = new Tone.Player({ url: s.url, loop: true });
@@ -49,5 +49,18 @@ export function createScene(destination: Tone.InputNode): Scene {
   return {
     start: () => players.forEach((p) => p.start()),
     restart: () => players.forEach((p) => p.restart()),
+  };
+}
+
+// WAV on purpose: the file is authored to chain seamlessly and ships unmodified —
+// a lossy re-encode would pad the edges and break the join. It plays as authored:
+// straight to the destination, no gain trim, no spatialization. No loop: the
+// controller retriggers it once per ring cycle, so at cycle ≈ file length the
+// strikes chain like the original loop.
+export function createBellScene(destination: Tone.InputNode): Scene {
+  const player = new Tone.Player({ url: `${BASE}audio/bell.wav` }).connect(destination);
+  return {
+    start: () => player.start(),
+    restart: () => player.restart(),
   };
 }

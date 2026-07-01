@@ -33,6 +33,7 @@ export function startRenderer(
   pattern: Pattern,
   onFinish?: () => void, // fires once at fade start (finish or stop); re-arms on restart
   onFadeComplete?: () => void, // fires once when the fade reaches full background
+  onCycle?: () => void, // fires when a new ring cycle begins (not at session start)
 ): RendererHandle | null {
   const host = createPatternHost(canvas, pattern);
   if (!host) return null;
@@ -59,6 +60,7 @@ export function startRenderer(
   let elapsed = 0; // seconds since start, for session timing
   let stopElapsed = 0; // elapsed at the moment stop() was called
   let ringPhase = 0;
+  let lastCycles = 0;
   const finishLatch = createFinishLatch();
   let fadeDone = false; // one-shot guard for onFadeComplete
 
@@ -80,6 +82,8 @@ export function startRenderer(
     } else {
       session = sessionState(elapsed, config.cycleSeconds, config.rounds, FADE_SECONDS);
       if (finishLatch.check(session.finished)) onFinish?.();
+      if (!session.finished && session.cyclesDone > lastCycles) onCycle?.();
+      lastCycles = session.cyclesDone;
     }
 
     // When an ending session reaches full background, fire once and go idle.
@@ -99,6 +103,7 @@ export function startRenderer(
       mode = "running";
       elapsed = 0;
       ringPhase = 0;
+      lastCycles = 0;
       stopElapsed = 0;
       fadeDone = false;
       finishLatch.reset();

@@ -46,15 +46,35 @@ describe("config persistence", () => {
     expect(loadConfig()).toEqual(DEFAULT_CONFIG);
   });
 
-  it("defaults audio off and clamps out-of-range volume", () => {
-    expect(DEFAULT_CONFIG.audioEnabled).toBe(false);
+  it("defaults soundscape off and clamps out-of-range volume", () => {
+    expect(DEFAULT_CONFIG.soundscape).toBe("off");
     localStorage.setItem(
       "hakalau.config",
-      JSON.stringify({ audioEnabled: true, volume: 5 }),
+      JSON.stringify({ soundscape: "bell", volume: 5 }),
     );
     const cfg = loadConfig();
-    expect(cfg.audioEnabled).toBe(true); // valid → kept
+    expect(cfg.soundscape).toBe("bell"); // valid → kept
     expect(cfg.volume).toBe(DEFAULT_CONFIG.volume); // out of range → default
+  });
+
+  it("rejects an unknown soundscape", () => {
+    localStorage.setItem("hakalau.config", JSON.stringify({ soundscape: "rain" }));
+    expect(loadConfig().soundscape).toBe("off");
+  });
+
+  it("migrates the legacy audioEnabled boolean", () => {
+    localStorage.setItem("hakalau.config", JSON.stringify({ audioEnabled: true }));
+    expect(loadConfig().soundscape).toBe("garden");
+    localStorage.setItem("hakalau.config", JSON.stringify({ audioEnabled: false }));
+    expect(loadConfig().soundscape).toBe("off");
+  });
+
+  it("prefers an explicit soundscape over the legacy flag", () => {
+    localStorage.setItem(
+      "hakalau.config",
+      JSON.stringify({ audioEnabled: true, soundscape: "bell" }),
+    );
+    expect(loadConfig().soundscape).toBe("bell");
   });
 
   it("keeps valid hex colors and rejects malformed ones", () => {

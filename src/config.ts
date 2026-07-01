@@ -4,6 +4,9 @@ import * as v from "valibot";
 // Colors are "#rrggbb"; fgColor paints both the dot and the ring.
 // fallback() yields per-field defaults when a value is missing or out of range.
 const hexColor = v.pipe(v.string(), v.regex(/^#[0-9a-f]{6}$/i));
+
+export const SOUNDSCAPES = ["off", "garden", "bell"] as const;
+export type Soundscape = (typeof SOUNDSCAPES)[number];
 const ConfigSchema = v.object({
   cycleSeconds: v.fallback(v.pipe(v.number(), v.minValue(0.5), v.maxValue(60)), 25),
   rounds: v.fallback(v.pipe(v.number(), v.integer(), v.minValue(0)), 0),
@@ -12,7 +15,7 @@ const ConfigSchema = v.object({
   ringSoftness: v.fallback(v.pipe(v.number(), v.minValue(0), v.maxValue(1)), 0.1),
   bgColor: v.fallback(hexColor, "#000000"),
   fgColor: v.fallback(hexColor, "#ffffff"),
-  audioEnabled: v.fallback(v.boolean(), false),
+  soundscape: v.fallback(v.picklist(SOUNDSCAPES), "off"),
   volume: v.fallback(v.pipe(v.number(), v.minValue(0), v.maxValue(1)), 0.5),
 });
 
@@ -26,7 +29,14 @@ export function loadConfig(): Config {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw === null) return { ...DEFAULT_CONFIG };
   try {
-    return v.parse(ConfigSchema, JSON.parse(raw));
+    const data: unknown = JSON.parse(raw);
+    // Configs saved before the soundscape dropdown stored an `audioEnabled`
+    // boolean; enabled meant the nature bed, which is now "garden".
+    if (typeof data === "object" && data !== null && !("soundscape" in data)) {
+      const legacy = data as Record<string, unknown>;
+      if (legacy.audioEnabled === true) legacy.soundscape = "garden";
+    }
+    return v.parse(ConfigSchema, data);
   } catch {
     return { ...DEFAULT_CONFIG };
   }
