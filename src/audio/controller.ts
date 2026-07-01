@@ -17,6 +17,7 @@ interface Bed {
 }
 
 export interface AudioController {
+  warm: () => void; // build every bed so all samples fetch+decode up front
   arm: () => Promise<void>; // resume the context on the user gesture, before start()
   start: (config: Config) => Promise<void>; // (re)start the configured bed and fade in
   cycle: () => void; // a new ring cycle began: the bell restrikes; other beds flow on
@@ -35,7 +36,6 @@ export function createAudioController(): AudioController {
   let muted = false;
   const audible = () => (muted ? 0 : target);
 
-  // Built lazily so choosing one soundscape never downloads the others' samples.
   function bedFor(name: BedName): Bed {
     const existing = beds.get(name);
     if (existing) return existing;
@@ -50,6 +50,12 @@ export function createAudioController(): AudioController {
   }
 
   return {
+    // Construction is inert (bus and master gains at 0, nothing started), so
+    // warming at page load downloads and decodes without a sound.
+    warm() {
+      bedFor("garden");
+      bedFor("bell");
+    },
     async arm() {
       await Tone.start(); // resume the context while the gesture is still live
     },
