@@ -62,3 +62,12 @@ needs a shader change. Carried over post-v1: concurrent rings; hyperspace/warp p
 - [x] Audio `arm()` resumes the context on the Start gesture, before the post-countdown `start()`
 - [x] Crossfades between screens (`.screen`); single-source `glHost.ts`, `.card`/`--brand` tokens
 - [x] Push branch + open PR to `main` (merged via PR #2)
+
+### Soundscape dropdown (Off / Garden / Bell)
+- [x] Config replaces `audioEnabled` with a validated soundscape choice (off/garden/bell); legacy `audioEnabled: true` migrates to garden
+- [x] Bell asset ships in `public/audio/bell.wav`: owner's BELL2.wav byte-identical (authored as a seamless loop; lossy re-encode would pad the seam), credited in CREDITS.md
+- [x] Audio controller plays the selected soundscape via lazy per-bed buses: Garden = streams + melody (keeps its fade-in), Bell = bell alone, unity gain, instant entry — no processing of any kind
+- [x] Bell strikes once per round (D13): renderer emits `onCycle` on each ring-cycle wrap; controller retriggers the bell, garden ignores it
+- [x] Overlay replaces the audio toggle with a soundscape dropdown; selection persists, sound plays only during a session (audition on the config screen was tried and dropped)
+- [x] Tests cover soundscape validation and the boolean→choice migration
+- [x] Verify by ear (`bun run dev`): bell strikes clean once per round and chains seamlessly at 25 s cycles — confirmed by owner

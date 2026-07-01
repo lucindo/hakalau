@@ -93,3 +93,14 @@ raw + Tone. Renderer stays the single source of truth for "session end" (it alre
 live); audio is told *when*, never recomputes it, so live `rounds`/`cycle` edits can't drift the two
 apart. Default-off + dynamic import keep the base bundle untouched for users who never enable sound.
 Decoupled because synced swell becomes a beat the mind tracks — the opposite of soft awareness.
+
+## D13 — Bell soundscape strikes once per round (amends D12's decoupling)
+**Q:** Should the bell loop freely like the nature bed, or align with the ring?
+**A:** Once per round: the renderer emits a per-cycle event (`onCycle`) and the bell retriggers on
+it; the garden bed ignores it and stays decoupled. The bell plays raw — unity gain, no fade-in,
+no processing; the WAV ships byte-identical to the source.
+**Why:** Owner's call after listening — one strike per round "gives a better sensation" (at the
+default 25 s cycle the 25 s file chains like a loop). D12's decoupling argument targeted
+continuous beds swelling with the ring; a discrete strike marking each round is the intent here,
+not an artifact. The renderer stays the single source of cycle timing — audio is told when, so
+live cycle/rounds edits and pause/resume can't drift the two apart.
