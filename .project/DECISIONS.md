@@ -104,3 +104,13 @@ default 25 s cycle the 25 s file chains like a loop). D12's decoupling argument 
 continuous beds swelling with the ring; a discrete strike marking each round is the intent here,
 not an artifact. The renderer stays the single source of cycle timing — audio is told when, so
 live cycle/rounds edits and pause/resume can't drift the two apart.
+
+## D14 — Preload all audio at page load (amends D12)
+**Q:** Samples downloaded only inside `start()` — after the countdown — so the 4.2MB bell WAV
+could stall the first strike on a cold cache. Preload on selection, or unconditionally at load?
+**A:** Unconditionally: `warm()` builds both beds at page load; every sample fetches and decodes
+up front. Tone remains an async chunk (first paint and base bundle untouched), and `start()`
+keeps `Tone.loaded()` as the slow-network safety net.
+**Why:** Owner's call — the preload must cover a first-time visitor (default off → picks Bell →
+Start), so it can't wait for a persisted choice; the wasted ~6.8MB for visitors who never enable
+sound is accepted. Supersedes D12's "sound-off users download nothing" property.

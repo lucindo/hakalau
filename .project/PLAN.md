@@ -1,11 +1,12 @@
 # Plan — Hakalau Meditation Canvas
 
 ## Now
-**State:** On `main`, clean and fully pushed; deploy live. Soundscape dropdown shipped (PR #4) plus
-bell retrigger/bleed-through fix (PR #5, verified by ear): sound is Off / Garden / Bell, bell strikes
-once per ring cycle (D13), audio plays only during sessions, legacy `audioEnabled` migrates. Bell
-asset is the owner's WAV byte-identical — never re-encode or process it. Spatial 3D bed remains
-abandoned on local `spatial-bed` (Panner3D collapses stereo beds; would need ambisonics to revisit).
+**State:** On `main`, clean and fully pushed; deploy live. Audio preload shipped (PR #6, verified
+by owner): `warm()` builds both beds at page load so all samples (bell 4.2MB + garden 2.6MB)
+fetch+decode before Start — every visitor pays the download, even with sound off (D14, amends
+D12). Tone stays an async chunk; first paint and base bundle unchanged. Bell asset is the owner's
+WAV byte-identical — never re-encode or process it. Spatial 3D bed remains abandoned on local
+`spatial-bed` (Panner3D collapses stereo beds; would need ambisonics to revisit).
 
 **Next:** none committed — pick a deferred item.
 
@@ -73,3 +74,4 @@ via `player.start()`.
 - [x] Tests cover soundscape validation and the boolean→choice migration
 - [x] Verify by ear (`bun run dev`): bell strikes clean once per round and chains seamlessly at 25 s cycles — confirmed by owner
 - [x] Fix (PR #5): bell retriggers via `player.start()` (Tone `restart()` no-ops on a stopped one-shot → bell died after first play); bed switch hard-zeroes the outgoing bus (ramp leaked a ~1 s garden tail once master came up) — verified by owner
+- [x] Preload (PR #6): `warm()` builds both beds at page load — all samples fetch+decode up front so Start never waits on the network (D14); selection-time warm removed — verified by owner
