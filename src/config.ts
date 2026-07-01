@@ -7,16 +7,29 @@ const hexColor = v.pipe(v.string(), v.regex(/^#[0-9a-f]{6}$/i));
 
 export const SOUNDSCAPES = ["off", "garden", "bell"] as const;
 export type Soundscape = (typeof SOUNDSCAPES)[number];
+
+// Shared with the overlay's sliders so UI range and stored-value validation
+// can't drift — an out-of-range save would silently reset to the default.
+export const CONFIG_BOUNDS = {
+  cycleSeconds: { min: 0.5, max: 60 },
+  dotSize: { min: 1, max: 40 },
+  ringSoftness: { min: 0, max: 1 },
+  volume: { min: 0, max: 1 },
+} as const;
+
+const bounded = (b: { min: number; max: number }, fallback: number) =>
+  v.fallback(v.pipe(v.number(), v.minValue(b.min), v.maxValue(b.max)), fallback);
+
 const ConfigSchema = v.object({
-  cycleSeconds: v.fallback(v.pipe(v.number(), v.minValue(0.5), v.maxValue(60)), 25),
+  cycleSeconds: bounded(CONFIG_BOUNDS.cycleSeconds, 25),
   rounds: v.fallback(v.pipe(v.number(), v.integer(), v.minValue(0)), 0),
   dotEnabled: v.fallback(v.boolean(), true),
-  dotSize: v.fallback(v.pipe(v.number(), v.minValue(1), v.maxValue(40)), 5),
-  ringSoftness: v.fallback(v.pipe(v.number(), v.minValue(0), v.maxValue(1)), 0.1),
+  dotSize: bounded(CONFIG_BOUNDS.dotSize, 5),
+  ringSoftness: bounded(CONFIG_BOUNDS.ringSoftness, 0.1),
   bgColor: v.fallback(hexColor, "#000000"),
   fgColor: v.fallback(hexColor, "#ffffff"),
   soundscape: v.fallback(v.picklist(SOUNDSCAPES), "off"),
-  volume: v.fallback(v.pipe(v.number(), v.minValue(0), v.maxValue(1)), 0.5),
+  volume: bounded(CONFIG_BOUNDS.volume, 0.5),
 });
 
 export type Config = v.InferOutput<typeof ConfigSchema>;
