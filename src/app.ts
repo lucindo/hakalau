@@ -24,8 +24,16 @@ export function startApp(canvas: HTMLCanvasElement, config: Config): void {
         audio = m.createAudioController();
         return audio;
       });
+      // A failed load (e.g. offline at page load) must not stick for the whole
+      // page life — clear it so the next attempt retries the import.
+      loading.catch(() => {
+        loading = null;
+      });
     }
     return loading;
+  };
+  const audioFailed = (err: unknown): void => {
+    console.warn("audio unavailable — session runs silent", err);
   };
 
   const pattern = getPattern("expanding-ring");
@@ -76,7 +84,10 @@ export function startApp(canvas: HTMLCanvasElement, config: Config): void {
     // pointer-events blocks clicks once the screen fades, but the still-focused
     // Start button can re-fire via Enter until visibility flips (~0.5s).
     if (screen !== "config") return;
-    if (config.soundscape !== "off") void ensureAudio().then((a) => a.arm());
+    if (config.soundscape !== "off")
+      void ensureAudio()
+        .then((a) => a.arm())
+        .catch(audioFailed);
     // Cover the idle dot with the session background so the numeral stands
     // alone; matching bg makes the cut into the running session seamless.
     countdown.el.style.background = config.bgColor;
@@ -88,7 +99,10 @@ export function startApp(canvas: HTMLCanvasElement, config: Config): void {
   function begin(): void {
     setScreen("running");
     renderer.restart();
-    if (config.soundscape !== "off") void ensureAudio().then((a) => a.start(config));
+    if (config.soundscape !== "off")
+      void ensureAudio()
+        .then((a) => a.start(config))
+        .catch(audioFailed);
   }
 
   function resume(): void {
