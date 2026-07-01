@@ -73,6 +73,9 @@ export function startApp(canvas: HTMLCanvasElement, config: Config): void {
   setScreen("config");
 
   function startCountdown(): void {
+    // pointer-events blocks clicks once the screen fades, but the still-focused
+    // Start button can re-fire via Enter until visibility flips (~0.5s).
+    if (screen !== "config") return;
     if (config.soundscape !== "off") void ensureAudio().then((a) => a.arm());
     // Cover the idle dot with the session background so the numeral stands
     // alone; matching bg makes the cut into the running session seamless.
