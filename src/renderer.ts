@@ -4,9 +4,9 @@ import type { Pattern } from "./patterns";
 import {
   createFinishLatch,
   FADE_SECONDS,
+  fadeBrightness,
   type SessionState,
   sessionState,
-  stopFadeBrightness,
 } from "./session";
 
 export interface RendererHandle {
@@ -75,7 +75,7 @@ export function startRenderer(
 
     let session: SessionState;
     if (mode === "stopping") {
-      const brightness = stopFadeBrightness(elapsed - stopElapsed, FADE_SECONDS);
+      const brightness = fadeBrightness(elapsed - stopElapsed, FADE_SECONDS);
       session = { cyclesDone: 0, ringActive: false, finished: true, brightness };
     } else if (mode === "idle") {
       session = IDLE_SESSION;

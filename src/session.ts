@@ -19,15 +19,14 @@ export function sessionState(
   if (rounds === 0 || cyclesDone < rounds) {
     return { cyclesDone, ringActive: true, finished: false, brightness: 1 };
   }
-  const sinceEnd = elapsedSeconds - rounds * cycleSeconds;
-  const brightness = Math.max(0, 1 - sinceEnd / fadeSeconds);
+  const brightness = fadeBrightness(elapsedSeconds - rounds * cycleSeconds, fadeSeconds);
   return { cyclesDone, ringActive: false, finished: true, brightness };
 }
 
-// Linear fade from 1 to 0 over fadeSeconds, used when the user stops a session
-// early (rounds === 0 is endless, so there's no natural completion to ride).
-export function stopFadeBrightness(sinceStopSeconds: number, fadeSeconds: number): number {
-  return Math.max(0, 1 - sinceStopSeconds / fadeSeconds);
+// Linear fade from 1 to 0 over fadeSeconds — the one fade curve, shared by
+// natural completion (above) and an early stop (renderer's stopping mode).
+export function fadeBrightness(sinceFadeStartSeconds: number, fadeSeconds: number): number {
+  return Math.max(0, 1 - sinceFadeStartSeconds / fadeSeconds);
 }
 
 // One-shot latch on session completion: check() returns true only on the first
