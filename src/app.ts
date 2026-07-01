@@ -12,8 +12,10 @@ type Screen = "config" | "countdown" | "running" | "paused" | "ending";
 
 // Owns the session flow: config → countdown → running → (paused) → fade → config.
 export function startApp(canvas: HTMLCanvasElement, config: Config): void {
-  // Tone + the controller load only when audio is used, keeping it out of the
-  // base bundle. Warmed on enable so the gesture is ready when Start is pressed.
+  // Tone + the controller stay a separate async chunk so the first paint is
+  // never blocked, but everything preloads at page load: all samples fetch and
+  // decode up front so Start never waits on the network (owner's call — the
+  // download is paid even if sound stays off).
   let audio: AudioController | null = null;
   let loading: Promise<AudioController> | null = null;
   const ensureAudio = (): Promise<AudioController> => {
@@ -44,15 +46,10 @@ export function startApp(canvas: HTMLCanvasElement, config: Config): void {
     return;
   }
   const renderer = handle;
-  if (config.soundscape !== "off") void ensureAudio();
+  void ensureAudio().then((a) => a.warm());
 
   const panel = createConfigPanel(config, {
     onStart: startCountdown,
-    // Sound plays only during a session; picking a soundscape just warms the
-    // audio module so the Start gesture is ready.
-    onSoundscapeChange: () => {
-      if (config.soundscape !== "off") void ensureAudio();
-    },
     onVolumeChange: () => audio?.setVolume(config.volume),
   });
   const previewCanvas = document.createElement("canvas");

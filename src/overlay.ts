@@ -7,7 +7,6 @@ import { COLOR_PRESETS } from "./presets";
 
 export interface OverlayHandlers {
   onStart: () => void; // "Start session" pressed
-  onSoundscapeChange: () => void; // soundscape picked (already persisted)
   onVolumeChange: () => void; // volume edited (already persisted)
 }
 
@@ -83,7 +82,6 @@ export function createConfigPanel(config: Config, handlers: OverlayHandlers): HT
   addSelect(panel, "Sound", soundscapeOptions, config.soundscape, (val) => {
     config.soundscape = val as Soundscape; // options above are exactly the Soundscape values
     saveConfig(config);
-    handlers.onSoundscapeChange();
   });
   addRange(panel, "Volume", 0, 1, 0.01, config.volume, (v) => {
     config.volume = v;
