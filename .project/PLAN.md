@@ -1,20 +1,21 @@
 # Plan — Hakalau Meditation Canvas
 
 ## Now
-**State:** On `main`, clean tree (2 unpushed docs-only commits). Everything merged & deployed: v1,
-session-flow rework (PR #2), audio bed polish (PR #3 — leaves stream + seamless `loop:true` loops via
-offline tail→head `acrossfade`). The current bed (stereo ocean floor + birds/wind/leaves + central
-generative melody) is the **keeper**. Spatial 3D bed was attempted on branch `spatial-bed` (unpushed,
-not merged) and **abandoned**: per-source Panner3D collapses the stereo ambiences to mono points →
-thinner, not richer. Wrong tool for stereo beds; would need ambisonics/decorrelation to revisit.
+**State:** On `main`, clean and fully pushed; deploy live. Soundscape dropdown shipped (PR #4) plus
+bell retrigger/bleed-through fix (PR #5, verified by ear): sound is Off / Garden / Bell, bell strikes
+once per ring cycle (D13), audio plays only during sessions, legacy `audioEnabled` migrates. Bell
+asset is the owner's WAV byte-identical — never re-encode or process it. Spatial 3D bed remains
+abandoned on local `spatial-bed` (Panner3D collapses stereo beds; would need ambisonics to revisit).
 
-**Next:** none committed — pick a deferred item, or push the two local docs commits.
+**Next:** none committed — pick a deferred item.
 
-**Open questions:** keep or delete the `spatial-bed` branch? Deferred (post-v1): preview dot/ring render
-bold (needs a shader change); concurrent rings; hyperspace/warp pattern.
+**Open questions:** keep or delete the local `spatial-bed` branch? Deferred: preview dot/ring render
+bold (faithful scaling needs a shader change); concurrent rings; hyperspace/warp pattern.
 
-**Open questions / deferred:** preview dot/ring render bold (absolute device-px) — faithful scaling
-needs a shader change. Carried over post-v1: concurrent rings; hyperspace/warp pattern.
+**Watch:** `PROJECT.md` repo map is broadly stale — missing `src/app.ts`, `src/preview.ts`,
+`src/glHost.ts`, `src/audio/`, `public/audio/` (drift from PRs #2–#4) — run `/ds-project-map`.
+Tone gotcha worth remembering: `Source.restart()` silently no-ops on a stopped one-shot; retrigger
+via `player.start()`.
 
 ## Roadmap
 
