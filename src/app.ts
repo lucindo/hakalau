@@ -46,7 +46,7 @@ export function startApp(canvas: HTMLCanvasElement, config: Config): void {
     return;
   }
   const renderer = handle;
-  void ensureAudio().then((a) => a.warm());
+  void ensureAudio();
 
   const panel = createConfigPanel(config, {
     onStart: startCountdown,
