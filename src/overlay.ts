@@ -1,4 +1,4 @@
-import { type Config, saveConfig } from "./config";
+import { type Config, type Soundscape, saveConfig } from "./config";
 import { COLOR_PRESETS } from "./presets";
 
 // Config panel for the home screen. The app state machine owns its visibility;
@@ -7,7 +7,8 @@ import { COLOR_PRESETS } from "./presets";
 
 export interface OverlayHandlers {
   onStart: () => void; // "Start session" pressed
-  onAudioChange: () => void; // audio enable/volume edited (already persisted)
+  onSoundscapeChange: () => void; // soundscape picked (already persisted)
+  onVolumeChange: () => void; // volume edited (already persisted)
 }
 
 export function createConfigPanel(config: Config, handlers: OverlayHandlers): HTMLElement {
@@ -74,15 +75,20 @@ export function createConfigPanel(config: Config, handlers: OverlayHandlers): HT
     saveConfig(config);
   });
 
-  addCheckbox(panel, "Sound", config.audioEnabled, (v) => {
-    config.audioEnabled = v;
+  const soundscapeOptions = [
+    { value: "off", label: "Off" },
+    { value: "garden", label: "Garden" },
+    { value: "bell", label: "Bell" },
+  ];
+  addSelect(panel, "Sound", soundscapeOptions, config.soundscape, (val) => {
+    config.soundscape = val as Soundscape; // options above are exactly the Soundscape values
     saveConfig(config);
-    handlers.onAudioChange();
+    handlers.onSoundscapeChange();
   });
   addRange(panel, "Volume", 0, 1, 0.01, config.volume, (v) => {
     config.volume = v;
     saveConfig(config);
-    handlers.onAudioChange();
+    handlers.onVolumeChange();
   });
 
   startBtn.addEventListener("click", () => handlers.onStart());

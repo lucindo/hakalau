@@ -1,50 +1,91 @@
 import * as Tone from "tone";
-import type { Config } from "../config";
+import type { Config, Soundscape } from "../config";
 import { FADE_SECONDS } from "../session";
 import { createMelody } from "./melody";
-import { createScene } from "./scene";
+import { createBellScene, createGardenScene } from "./scene";
 
 const FADE_IN_SECONDS = 2;
 const CONTROL_RAMP = 0.1; // smooth a live volume/mute change without a click
+const BED_SWAP_SECONDS = 1; // outgoing bed fades under the incoming one on a live switch
+
+type BedName = Exclude<Soundscape, "off">;
+
+interface Bed {
+  bus: Tone.Gain;
+  parts: ReadonlyArray<{ start: () => void; restart: () => void }>;
+  started: boolean;
+  fadeIn: number; // seconds; 0 = enter at full level immediately
+}
 
 export interface AudioController {
   arm: () => Promise<void>; // resume the context on the user gesture, before start()
-  start: (config: Config) => Promise<void>; // (re)start the bed and fade in
+  start: (config: Config) => Promise<void>; // (re)start the configured bed and fade in
+  cycle: () => void; // a new ring cycle began: the bell restrikes; other beds flow on
   finish: () => void; // fade out over FADE_SECONDS, mirroring the visual session fade
   setVolume: (volume: number) => void;
   setMuted: (muted: boolean) => void;
 }
 
-// Owns the master gain envelope and session lifecycle; the scene owns the graph.
+// Owns the master gain envelope and session lifecycle; each bed owns its graph.
 // Tone lives here so the dynamic import keeps it out of the base bundle.
 export function createAudioController(): AudioController {
   const master = new Tone.Gain(0).toDestination();
-  const scene = createScene(master);
-  const melody = createMelody(master);
+  const beds = new Map<BedName, Bed>();
+  let current: BedName | null = null;
   let target = 0; // gain to ramp toward when audible; mute parks the envelope at 0
   let muted = false;
-  let started = false;
   const audible = () => (muted ? 0 : target);
+
+  // Built lazily so choosing one soundscape never downloads the others' samples.
+  function bedFor(name: BedName): Bed {
+    const existing = beds.get(name);
+    if (existing) return existing;
+    const bus = new Tone.Gain(0).connect(master);
+    // Bell enters clean: a fade-in would swell over the strike attacks.
+    const bed: Bed =
+      name === "garden"
+        ? { bus, parts: [createGardenScene(bus), createMelody(bus)], started: false, fadeIn: FADE_IN_SECONDS }
+        : { bus, parts: [createBellScene(bus)], started: false, fadeIn: 0 };
+    beds.set(name, bed);
+    return bed;
+  }
 
   return {
     async arm() {
       await Tone.start(); // resume the context while the gesture is still live
     },
     async start(config) {
+      if (config.soundscape === "off") return; // callers guard; narrows the bed name
+      const bed = bedFor(config.soundscape);
       target = config.volume;
       muted = false;
       await Tone.start(); // idempotent; context already resumed by arm()
       await Tone.loaded(); // decode the buffers before playing
-      if (started) {
-        scene.restart();
-        melody.restart();
-      } else {
-        scene.start();
-        melody.start();
-        started = true;
+      if (current !== null && current !== config.soundscape) {
+        bedFor(current).bus.gain.rampTo(0, BED_SWAP_SECONDS);
       }
+      current = config.soundscape;
+      // Gains land before the players emit so an instant entry isn't clipped.
+      bed.bus.gain.cancelScheduledValues(Tone.now());
       master.gain.cancelScheduledValues(Tone.now());
-      master.gain.rampTo(audible(), FADE_IN_SECONDS);
+      if (bed.fadeIn === 0) {
+        bed.bus.gain.value = 1;
+        master.gain.value = audible();
+      } else {
+        bed.bus.gain.rampTo(1, BED_SWAP_SECONDS);
+        master.gain.rampTo(audible(), bed.fadeIn);
+      }
+      if (bed.started) {
+        for (const p of bed.parts) p.restart();
+      } else {
+        for (const p of bed.parts) p.start();
+        bed.started = true;
+      }
+    },
+    cycle() {
+      if (current !== "bell") return;
+      const bed = beds.get(current);
+      if (bed) for (const p of bed.parts) p.restart();
     },
     finish() {
       master.gain.rampTo(0, FADE_SECONDS);

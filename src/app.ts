@@ -36,6 +36,7 @@ export function startApp(canvas: HTMLCanvasElement, config: Config): void {
       if (screen === "running" || screen === "paused") setScreen("ending");
     },
     () => setScreen("config"),
+    () => audio?.cycle(),
   );
   if (!handle) {
     canvas.remove();
@@ -43,15 +44,16 @@ export function startApp(canvas: HTMLCanvasElement, config: Config): void {
     return;
   }
   const renderer = handle;
-  if (config.audioEnabled) void ensureAudio();
+  if (config.soundscape !== "off") void ensureAudio();
 
   const panel = createConfigPanel(config, {
     onStart: startCountdown,
-    onAudioChange: () => {
-      if (config.audioEnabled) void ensureAudio();
-      audio?.setMuted(!config.audioEnabled);
-      audio?.setVolume(config.volume);
+    // Sound plays only during a session; picking a soundscape just warms the
+    // audio module so the Start gesture is ready.
+    onSoundscapeChange: () => {
+      if (config.soundscape !== "off") void ensureAudio();
     },
+    onVolumeChange: () => audio?.setVolume(config.volume),
   });
   const previewCanvas = document.createElement("canvas");
   previewCanvas.className = "preview";
@@ -74,7 +76,7 @@ export function startApp(canvas: HTMLCanvasElement, config: Config): void {
   setScreen("config");
 
   function startCountdown(): void {
-    if (config.audioEnabled) void ensureAudio().then((a) => a.arm());
+    if (config.soundscape !== "off") void ensureAudio().then((a) => a.arm());
     // Cover the idle dot with the session background so the numeral stands
     // alone; matching bg makes the cut into the running session seamless.
     countdown.el.style.background = config.bgColor;
@@ -86,7 +88,7 @@ export function startApp(canvas: HTMLCanvasElement, config: Config): void {
   function begin(): void {
     setScreen("running");
     renderer.restart();
-    if (config.audioEnabled) void ensureAudio().then((a) => a.start(config));
+    if (config.soundscape !== "off") void ensureAudio().then((a) => a.start(config));
   }
 
   function resume(): void {
