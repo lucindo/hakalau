@@ -141,6 +141,9 @@ function addNumber(
   input.step = "1";
   input.value = String(value);
   input.addEventListener("input", () => {
+    // Mid-edit clear reads as "" (Number("") === 0) — keep the last valid value
+    // rather than silently persisting 0 (= endless).
+    if (input.value === "") return;
     const v = Math.floor(Number(input.value));
     if (Number.isFinite(v) && v >= 0) onChange(v);
   });
