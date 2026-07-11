@@ -1,22 +1,23 @@
 # Plan — Hakalau Meditation Canvas
 
 ## Now
-**State:** On `main`, clean and fully pushed at **v1.0.0**; deploy live. Full-codebase quality pass
-merged (PR #7): every finding from the deslop/quality/SSOT/bug/TS review sweeps applied or closed.
-Audio failure policy in place (D15: import retries, sample failures degrade silent). Note: D14's
-`warm()` was folded away — preload now happens inside `createAudioController()`; same behavior.
-Bell asset is the owner's WAV byte-identical — never re-encode or process it. Spatial 3D bed
-remains abandoned on local `spatial-bed` (Panner3D collapses stereo beds).
+**State:** On `main`, clean and fully pushed; deploy live and owner-tested. PR #8 merged: all UI
+chrome restyled in Mono Zen dark, adapted from lucindo/hrv (D17) — slate tokens replace the teal
+brand, pill controls, 20px translucent cards, Inter Variable ships. Canvas colors stay
+user-configured. Bell asset remains the owner's WAV byte-identical — never re-encode or process
+it. Spatial 3D bed remains abandoned on local `spatial-bed` (Panner3D collapses stereo beds).
 
 **Next:** none committed — pick a deferred item.
 
-**Open questions:** keep or delete the local `spatial-bed` branch? Deferred: preview dot/ring render
-bold (faithful scaling needs a shader change); concurrent rings; hyperspace/warp pattern.
+**Open questions:** keep or delete the local `spatial-bed` branch? Deferred: markup-level Mono Zen
+polish (round icon-style close button, 1.5-stroke SVG icons); preview dot/ring render bold
+(faithful scaling needs a shader change); concurrent rings; hyperspace/warp pattern.
 
 **Watch:** `PROJECT.md` repo map is broadly stale — missing `src/app.ts`, `src/preview.ts`,
-`src/glHost.ts`, `src/audio/`, `public/audio/` (drift from PRs #2–#4) — run `/ds-project-map`.
-Tone gotcha worth remembering: `Source.restart()` silently no-ops on a stopped one-shot; retrigger
-via `player.start()`.
+`src/glHost.ts`, `src/audio/`, `public/audio/`, and now the Inter dependency + Mono Zen tokens
+(PR #8) — run `/ds-project-map`. Tone gotcha worth remembering: `Source.restart()` silently
+no-ops on a stopped one-shot; retrigger via `player.start()`. Remote `feat/ui-look-and-feel` may
+linger on origin unless auto-deleted on merge.
 
 ## Roadmap
 
@@ -82,3 +83,8 @@ via `player.start()`.
 - [x] Fixes: audio failure recovery (D15), countdown keyboard re-entry guard, cleared rounds field no longer persists 0
 - [x] Cleanups: `warm()` folded into controller construction; one fade curve (`fadeBrightness`); fade/finish share the latch idiom
 - [~] Canvas-sizing dedup (renderer vs preview) — closed won't-fix (D16)
+
+### Mono Zen UI restyle (PR #8)
+- [x] UI chrome restyled on hrv's Mono Zen dark tokens (D17): slate palette replaces teal, pill controls, 20px translucent cards, Inter Variable font — CSS-only, no markup changes
+- [x] Countdown digits at panel font weight (400; weight 200 read as a different typeface at 22vmin)
+- [x] Owner-verified in dev and on the live deploy

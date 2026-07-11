@@ -132,3 +132,14 @@ and SSOT reviews). Unify behind a shared `fit()` on the pattern host?
 **Why:** Unifying forces real semantic changes (window→element sizing, resize-event→per-frame
 reads) on an eye-verified renderer; ~10 saved lines don't cover the regression risk. Revisit only
 if a third GL surface appears.
+
+## D17 — UI chrome adopts Mono Zen (adapted from lucindo/hrv)
+**Q:** The controls wore a teal brand on frosted black. Match the owner's hrv app's Mono Zen
+look — and copy it wholesale, or adapt?
+**A:** Adopt hrv's Mono Zen **dark** token set for all UI chrome — monochrome cool slate
+(accent `#b4bac4`), pill controls, 20 px card radius, Inter Variable — with three adaptations:
+teal is gone entirely; cards stay translucent + blurred (hrv's are opaque) so the canvas ghosts
+through; dark tokens only, no theme switch. Canvas colors remain user-configured; chrome only.
+Countdown runs at panel font weight (400) — extra-light read as a different typeface at 22 vmin.
+**Why:** Owner wants both apps to share a look, and monochrome chrome recedes better in a
+meditation app. Inter's ~48 KB is noise beside the ~6.8 MB audio preload (D14). Shipped in PR #8.
