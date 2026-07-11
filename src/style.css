@@ -1,8 +1,22 @@
+/* Mono Zen (dark) — adapted from lucindo/hrv's theme: monochrome cool slate,
+   pill-shaped controls, soft hairline borders. UI chrome only; the canvas
+   colors stay user-configured. */
 :root {
-  --brand: #5fb3b3;
-  --brand-hover: #6fc3c3;
-  --hairline: 1px solid rgba(255, 255, 255, 0.08);
-  --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  --surface: rgba(37, 41, 50, 0.8);
+  --bg-soft: #23272f;
+  --accent: #b4bac4;
+  --accent-strong: #ccd0d9;
+  --on-accent: #1a1d24;
+  --text: #dde0e6;
+  --text-soft: #8a8d95;
+  --border-soft: rgba(168, 174, 184, 0.16);
+  --hairline: 1px solid var(--border-soft);
+  --card-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.3);
+  --font:
+    "Inter Variable", Inter, ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
 }
 
 html,
@@ -11,12 +25,32 @@ body {
   height: 100%;
   background: #000;
   overflow: hidden;
+  font-family: var(--font);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* Frosted panel treatment shared by the config and pause cards. */
 .card {
-  border-radius: 14px;
-  background: rgba(18, 18, 20, 0.7);
+  border-radius: 20px;
+  background: var(--surface);
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
   border: var(--hairline);
@@ -66,7 +100,7 @@ canvas {
 .preview {
   width: min(300px, 70vw);
   aspect-ratio: 1;
-  border-radius: 14px;
+  border-radius: 20px;
   border: var(--hairline);
   box-shadow: var(--card-shadow);
 }
@@ -74,27 +108,31 @@ canvas {
 .overlay {
   width: min(320px, 100%);
   padding: 22px;
-  color: #e8e8e8;
-  font: 14px/1.4 system-ui, sans-serif;
-  accent-color: var(--brand);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.4;
+  accent-color: var(--accent);
 }
 
 .overlay__start {
   display: block;
   width: 100%;
   margin-bottom: 6px;
-  padding: 9px;
+  padding: 12px;
   border: 0;
-  border-radius: 8px;
-  background: var(--brand);
-  color: #0a0a0a;
-  font: 600 14px/1 system-ui, sans-serif;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease-out;
 }
 
 .overlay__start:hover {
-  background: var(--brand-hover);
+  background: var(--accent-strong);
 }
 
 .overlay__row {
@@ -112,12 +150,11 @@ canvas {
 .overlay__row select {
   flex: 1;
   min-width: 0;
-  padding: 4px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.3);
+  padding: 6px 12px;
+  border: var(--hairline);
+  border-radius: 999px;
+  background: var(--bg-soft);
   color: inherit;
-  font: inherit;
   cursor: pointer;
 }
 
@@ -125,8 +162,8 @@ canvas {
   width: 36px;
   height: 24px;
   padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
+  border: var(--hairline);
+  border-radius: 8px;
   background: none;
   cursor: pointer;
 }
@@ -138,12 +175,15 @@ canvas {
 .overlay__value {
   min-width: 3ch;
   text-align: right;
-  opacity: 0.7;
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
 }
 
 .countdown {
-  color: #e8e8e8;
-  font: 200 22vmin/1 system-ui, sans-serif;
+  color: var(--text);
+  font-size: 22vmin;
+  font-weight: 400;
+  line-height: 1;
 }
 
 .pause {
@@ -159,30 +199,40 @@ canvas {
 
 .pause__btn {
   min-width: 180px;
-  padding: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
+  padding: 12px;
+  border: var(--hairline);
+  border-radius: 999px;
   background: transparent;
-  color: #e8e8e8;
-  font: 600 14px/1 system-ui, sans-serif;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1;
   cursor: pointer;
   transition:
-    background 0.2s ease,
-    color 0.2s ease;
+    background 0.2s ease-out,
+    color 0.2s ease-out;
 }
 
 .pause__btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-soft);
 }
 
 .pause__btn--primary {
   border-color: transparent;
-  background: var(--brand);
-  color: #0a0a0a;
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .pause__btn--primary:hover {
-  background: var(--brand-hover);
+  background: var(--accent-strong);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay__start,
+  .pause__btn {
+    transition: none;
+  }
 }
 
 .fallback-dot {
