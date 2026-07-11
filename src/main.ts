@@ -1,3 +1,4 @@
+import "@fontsource-variable/inter";
 import "./style.css";
 import { startApp } from "./app";
 import { loadConfig } from "./config";
