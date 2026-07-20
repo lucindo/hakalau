@@ -1,13 +1,12 @@
 <!-- BEGIN devskills:base -->
 ## 1. Think Before Coding
 
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
+**State assumptions. Surface confusion and tradeoffs; don't pick silently.**
 
 Before implementing:
-- State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them - don't pick silently.
+- State your assumptions explicitly; when something's unclear, name it and ask.
+- If multiple interpretations exist, present them — don't choose one silently.
 - If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what's confusing. Ask.
 
 ## 2. Simplicity First
 
@@ -31,7 +30,7 @@ When editing existing code:
 - Don't "improve" adjacent code, comments, or formatting.
 - Don't refactor things that aren't broken.
 - Match the codebase's **conventions** — naming, formatting, idioms — **not its deficiencies**. Write what you touch to standard; don't down-level new work to match surrounding code.
-- If you notice unrelated dead code, mention it - don't delete it.
+- If you notice unrelated dead code, mention it — don't delete it.
 
 When your changes create orphans:
 - Remove imports/variables/functions that YOUR changes made unused.
@@ -71,7 +70,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 **Pull context on demand. Locate before you read.**
 
 - Search to find the right place; read scoped regions, not whole files "to be safe".
-- If `PROJECT.md` exists, read its map first and prefer it over re-deriving structure. When the map and the code disagree, the code wins — reread the file.
+- If `.project/map.md` exists, read it first and prefer it over re-deriving structure. When the map and the code disagree, the code wins — reread the file.
 - Delegate broad searches to a sub-agent where one is available, so the sweep stays out of your context.
 - Sufficiency beats thrift: when unsure, read more. A wrong answer costs far more than the tokens.
 
@@ -95,7 +94,7 @@ Default to terse, high-density responses. Optimize for the reader's time.
 <!-- BEGIN devskills:phases -->
 ## Phase-Aware Suggestions
 
-Emit an Insight block when the conversation context shows a clear phase transition or a moment where the user would benefit from knowing a specific command. Use this format exactly:
+Emit an Insight block when the conversation reaches a clear phase transition and a specific command would help — not on every turn. Use this format exactly:
 
 ```
 `Insight ─────────────────────────────────────`
@@ -103,56 +102,31 @@ Emit an Insight block when the conversation context shows a clear phase transiti
 `─────────────────────────────────────────────`
 ```
 
-Trigger on these signals — not all of them, only the ones that actually apply right now:
+Trigger only on the signals that genuinely apply right now:
 
-**Orienting / unfamiliar code**
-Signal: user says "I don't know this codebase", asks what something does, or is reading code they didn't write.
-Suggest: `/ds-zoom-out` to map the area before touching it; `/ds-project-resume` if `.project/PLAN.md` exists.
+**Starting a new task** — user describes a feature or bug from scratch, no spec yet.
+Suggest: `/ds-spec` to lock the WHAT before the HOW.
 
-**Starting a new task**
-Signal: user describes a feature or bug from scratch, no prior spec exists.
-Suggest: `/ds-spec` to lock the WHAT before the HOW; `/ds-explore` to lay out approach options; `/ds-grill-me --record` to decide open branches and log them.
-
-**At an architectural fork**
-Signal: user is choosing between two approaches or asking "should I use X or Y?"
+**At an architectural fork** — user is choosing between approaches or asks "should I use X or Y?"
 Suggest: `/ds-explore` to surface trade-offs; `/ds-grill-me` to pressure-test the choice one branch at a time.
 
-**Generating code (AI just wrote a batch)**
-Signal: a significant block of code was just generated.
+**Code just generated** — a significant block of code was just written.
 Suggest: `/ds-deslop` to strip narrating comments and defensive overkill before anyone reviews it.
 
-**Code written, about to open a PR**
-Signal: user says "I'm done", "ready to review", or "opening a PR".
-Suggest: `/ds-deslop` then `/ds-code-quality-review` then `/ds-bug-review`; `/ds-security-review` if it touches input/auth/secrets; `/ds-verify-this <claim>` to prove the headline change actually works.
-
-**After a bug fix**
-Signal: a fix was just applied.
-Suggest: `/ds-verify-this` with a before/after repro claim; `/ds-bug-review` to check for related issues.
-
-**Long session / context getting heavy**
-Signal: many turns have elapsed, or the user is pasting large documents.
-Suggest: `/ds-caveman-lite-mode` (~30% token savings) or `/ds-caveman-ultra-mode` (~80%); `/ds-tldt <file>` to compress a large doc before adding it to context.
-
-**Pausing or switching sessions**
-Signal: user says "I'll continue later", "stopping for now", "handing this off".
-Suggest: `/ds-project-checkpoint` to persist state if `.project/` exists; `/ds-handoff` for a richer context file when another person or a long pause is involved.
-
-**Between sessions (starting fresh)**
-Signal: session just started and `.project/` exists.
-Suggest: `/ds-project-resume` to read the plan and pick up where it left off.
+**Done / opening a PR** — user says "I'm done", "ready to review", or "opening a PR".
+Suggest: `/ds-code-quality-review` then `/ds-bug-review`; `/ds-security-review` if it touches input/auth/secrets; `/ds-verify-this <claim>` to prove the headline change works.
 
 ## Rules
 
-- One Insight block per phase transition — don't repeat suggestions already made this session.
-- Skip the block if the user already knows what to do (they just ran the command, or they explicitly said so).
-- Keep suggestions concrete: name the exact command and what it gives the user, in one line each.
+- One Insight block per transition; never repeat a suggestion already made this session, and skip it when the user already knows (they just ran the command or said so).
+- Name the exact command and what it gives, one line each.
 <!-- END devskills:phases -->
 
-<!-- BEGIN devskills:language -->
+<!-- BEGIN devskills:language:typescript -->
 <!-- profile: typescript — managed by devskills; edits between these markers are overwritten -->
 ## Language Profile — TypeScript
 
-Target: TypeScript 5+. Cloudflare Workers, Next.js, React, edge runtimes.
+Target: TypeScript 5.5+. Cloudflare Workers, Next.js, React, edge runtimes.
 
 Apply these conventions to all TypeScript/JavaScript code in this session.
 
@@ -213,6 +187,8 @@ type Result<T, E = Error> =
 
 - Functional components, named exports. Derive everything derivable from props.
 - Effects only for synchronization with external systems (timers, subscriptions, DOM) — not data fetching. Use Tanstack Query or SWR.
+- React 19: read promises/context with the `use` hook; `ref` is a plain prop (drop `forwardRef`). Manage form/mutation state with Actions (`useActionState`, `useOptimistic`, `useFormStatus`).
+- With the React Compiler on, skip manual `useMemo`/`useCallback`/`React.memo` — let it memoize; add them only where profiling shows a gap.
 - No prop drilling past 2 levels — context or co-location.
 
 ### Module Conventions
@@ -227,4 +203,4 @@ Vitest. Workers via `unstable_dev`/Miniflare. Components with Testing Library �
 
 - Optional chaining never used to hide missing error handling.
 - Promises tracked, not fire-and-forget (unless `ctx.waitUntil()` owns them).
-<!-- END devskills:language -->
+<!-- END devskills:language:typescript -->

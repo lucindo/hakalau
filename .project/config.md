@@ -1,7 +1,10 @@
 # Project config
 
+<!-- BEGIN devskills:modes -->
+
 ## Modes
 
 - ds-git-mode
-- ds-senior-mode
 - ds-step-mode
+
+<!-- END devskills:modes -->
