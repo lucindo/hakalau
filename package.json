@@ -17,6 +17,6 @@
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",
     "tone": "^15.1.22",
-    "valibot": "^1.4.1"
+    "valibot": "^1.4.2"
   }
 }
