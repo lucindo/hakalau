@@ -1,0 +1,181 @@
+name: Build desktop apps
+
+# Wraps the live site in a Pake (Tauri) shell. Deliberately decoupled from
+# deploy.yml: the installed app loads APP_URL, so web content auto-updates and a
+# desktop release is cut only when the shell itself changes.
+#   - workflow_dispatch : build installers as artifacts (test runs, no release)
+#   - push tag desktop-v*: build + publish a GitHub Release with the installers
+on:
+  push:
+    tags: ['desktop-v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PAKE_VERSION: "3.15.3" # bump deliberately; pinned for reproducible builds
+  APP_URL: "https://lucindo.github.io/hakalau/"
+  APP_NAME: "Hakalau"
+
+jobs:
+  build:
+    name: ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # --hide-title-bar is macOS-only since pake 3.12 — passing it elsewhere
+          # only earns a warning, so it rides in pake_extra rather than the shared args.
+          - os: macos-latest
+            platform: macos-universal
+            ext: dmg
+            pake_extra: "--multi-arch --hide-title-bar"
+            rust_targets: "aarch64-apple-darwin,x86_64-apple-darwin"
+          - os: windows-latest
+            platform: windows-x64
+            ext: msi
+            pake_extra: ""
+            rust_targets: ""
+          # One Linux job per package format — deb (apt), rpm (Fedora/openSUSE), and
+          # AppImage (distro-agnostic) cover the main families. ubuntu-22.04: build on
+          # the oldest supported Ubuntu for wider glibc compat.
+          - os: ubuntu-22.04
+            platform: linux-x64
+            ext: deb
+            pake_extra: "--targets deb"
+            rust_targets: ""
+          - os: ubuntu-22.04
+            platform: linux-x64
+            ext: rpm
+            pake_extra: "--targets rpm"
+            rust_targets: ""
+          - os: ubuntu-22.04
+            platform: linux-x64
+            ext: AppImage
+            pake_extra: "--targets appimage"
+            rust_targets: ""
+    steps:
+      - uses: actions/checkout@v6
+
+      # This job builds no TypeScript, so it skips bun entirely; 20 is the Node
+      # pake-cli is proven green on.
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust_targets }}
+
+      # Tauri 2 (Pake's runtime) Linux build prerequisites — webkit2gtk-4.1 et al.;
+      # `rpm` for the rpm bundle, `patchelf` for the AppImage bundle.
+      - name: Install Linux build deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev libgtk-3-dev \
+            libayatana-appindicator3-dev librsvg2-dev patchelf rpm
+
+      # Wrapper version = the tag (desktop-vX.Y.Z), decoupled from package.json. The
+      # app auto-updates via APP_URL, so the shell's version is whatever tag we push.
+      # Dispatch test runs have no tag, so they fall back to a dev marker.
+      - id: ver
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/desktop-v* ]]; then
+            echo "v=${GITHUB_REF_NAME#desktop-v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "v=0.0.0-dev" >> "$GITHUB_OUTPUT"
+          fi
+
+      # --icon is mandatory: omit it and pake falls back to fetching the site's
+      # favicon, which fails silently and ships an iconless app. icon-512.png must stay
+      # RGBA (color-type 6) — the Linux legs consume it raw and Tauri panics at
+      # `generate_context!` on anything else, and most SVG rasterizers emit color-type 2
+      # for a fully opaque image, so re-check after any icon refresh.
+      # --maximize opens filling the screen without the intrusiveness of real fullscreen;
+      # width/height are then only the un-maximized restore size. It's absent from
+      # `pake --help` (registered with hideHelp) but supported — verified in 3.15.3.
+      # Retry: macOS bundle_dmg.sh is intermittently flaky in CI (hdiutil/Finder race) —
+      # it fails with no output while the same image + command succeeds on a re-run.
+      # Cargo's target/ persists across attempts, so a retry only re-bundles, not rebuilds.
+      - name: Build with Pake
+        shell: bash
+        run: |
+          attempt=1; max=3
+          until npx --yes "pake-cli@${PAKE_VERSION}" "$APP_URL" \
+                  --name "$APP_NAME" \
+                  --icon public/icon-512.png \
+                  --width 1280 --height 800 \
+                  --maximize \
+                  ${{ matrix.pake_extra }}; do
+            if [ "$attempt" -ge "$max" ]; then
+              echo "pake build failed after $max attempts" >&2; exit 1
+            fi
+            attempt=$((attempt + 1)); echo "pake build failed; retry $attempt/$max..." >&2; sleep 5
+          done
+
+      # Pake copies <appname>.<target> into the workspace but slugifies the name on
+      # Linux and lowercases AppImage — so match by extension (nocaseglob: *.AppImage
+      # ⇢ hakalau.appimage) rather than guessing the name.
+      - name: Rename installer
+        shell: bash
+        env:
+          VERSION: ${{ steps.ver.outputs.v }}
+          EXT: ${{ matrix.ext }}
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          shopt -s nullglob nocaseglob
+          built=( *."${EXT}" )
+          shopt -u nocaseglob
+          if [ "${#built[@]}" -ne 1 ]; then
+            echo "expected exactly one *.${EXT} in workspace, found: ${built[*]:-none}" >&2; exit 1
+          fi
+          mv "${built[0]}" "Hakalau-${VERSION}-${PLATFORM}.${EXT}"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          # platform+ext: the three Linux formats share platform, so ext keeps it unique.
+          name: ${{ matrix.platform }}-${{ matrix.ext }}
+          path: Hakalau-*-${{ matrix.platform }}.${{ matrix.ext }}
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/desktop-v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: installers
+          merge-multiple: true
+      - name: Publish GitHub Release
+        # TAG/REPO via env, never inlined into the shell (deploy.yml convention).
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          cat > notes.md <<'EOF'
+          Native desktop builds of Hakalau — macOS (universal), Windows (x64), and Linux x64 (.deb / .rpm / .AppImage). The window opens maximized, since the practice wants the whole screen.
+
+          **Your settings do not carry over.** The desktop app keeps its own storage, separate from your browser, so it starts at the defaults — cycle, rounds, colors, and sound are set again on first run.
+
+          **Unsigned builds.** First launch:
+          - **macOS** may report the app is "damaged". Run
+            `xattr -dr com.apple.quarantine "/Applications/Hakalau.app"`,
+            or right-click the app → Open.
+          - **Windows** SmartScreen: click **More info → Run anyway**.
+          - **Linux** — pick your format: `.deb` (Debian/Ubuntu), `.rpm` (Fedora/openSUSE),
+            or `.AppImage` (any distro — `chmod +x` and run).
+
+          The app loads the live site, so web content stays up to date automatically.
+          EOF
+          gh release create "$TAG" installers/* \
+            --repo "$REPO" \
+            --title "$TAG" \
+            --notes-file notes.md
