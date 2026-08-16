@@ -25,6 +25,7 @@ Pick from the deferred pool in PLAN.md — concurrent rings, hyperspace/warp pat
 - `PAKE_VERSION` stays pinned in `desktop.yml` — bump deliberately, never `@latest`.
 - The desktop window opens `--maximize`, never `--fullscreen`; `--width`/`--height` are only the restore size.
 - The icon set stays trimmed — master SVG, `favicon.svg`, apple-touch-icon, `icon-512.png`; no PWA manifest, no maskable variants.
+- Dependabot version-update config (`.github/dependabot.yml`) was removed on purpose; security alerts stay enabled separately — don't re-add the file without asking.
 
 # hazards
 - `public/audio/bell.wav`: owner's first-party WAV authored as a seamless loop — any re-encode or resample pads the seam and breaks the chain.
