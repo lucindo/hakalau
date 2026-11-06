@@ -2,7 +2,7 @@
 v1.0.0 live on Pages with the ripple icon, and Pake desktop installers released for macOS/Windows/Linux; nothing in flight.
 
 # next
-Pick from the deferred pool in PLAN.md — concurrent rings, hyperspace/warp pattern, Mono Zen markup polish, faithful preview scaling.
+Pick from the deferred pool — concurrent rings, hyperspace/warp pattern, Mono Zen markup polish, faithful preview scaling.
 
 # settled
 - Renderer is a raw WebGL2 fullscreen fragment shader — Three.js and CSS/Canvas-2D-as-primary are forbidden.
@@ -27,6 +27,7 @@ Pick from the deferred pool in PLAN.md — concurrent rings, hyperspace/warp pat
 - The icon set stays trimmed — master SVG, `favicon.svg`, apple-touch-icon, `icon-512.png`; no PWA manifest, no maskable variants.
 - Dependabot version-update config (`.github/dependabot.yml`) was removed on purpose; security alerts stay enabled separately — don't re-add the file without asking.
 - Dependabot security PRs are not merged — bump the deps on a local branch and let the bot PR auto-close.
+- TV casting is OS/browser mirroring per `.project/CAST-TO-TV.md` — don't re-research it, and never add the Cast SDK or a custom Web Receiver.
 
 # hazards
 - `public/audio/bell.wav`: owner's first-party WAV authored as a seamless loop — any re-encode or resample pads the seam and breaks the chain.
@@ -34,4 +35,4 @@ Pick from the deferred pool in PLAN.md — concurrent rings, hyperspace/warp pat
 - `src/audio/scene.ts`: Tone's `restart()` silently no-ops on a stopped one-shot — the bell retriggers via `player.start()`.
 - `src/shaders/expanding-ring.frag`: ring count is hardcoded, not parameterized — concurrent rings is a shader change, not a config change.
 - `public/icon-512.png`: must stay RGBA (color-type 6) — rasterizers emit color-type 2 for the opaque plate, and Tauri's Linux icon path then panics at `generate_context!`.
-- `.project/*.md`: PROJECT.md, PLAN.md, DECISIONS.md and SPEC.md still describe a click-to-reveal settings overlay and an audio-free v1 that no longer exist — verify against code before trusting.
+- `.project/EXPLORE.md`: predates the shipped audio and still says no Web Audio code exists — verify against code before trusting.
